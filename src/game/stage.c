@@ -11,7 +11,7 @@
 #define PLATFORM_COUNT 5
 #define TILE_COUNT 16
 static const float CLOUD_SPEED = 0.5f;
-static const float INITIAL_GLOBAL_SPEED = 0.5f;
+static const float INITIAL_GLOBAL_SPEED = 1.0f;
 static const float PLATFORM_INTERVAL = 64.0f;
 
 // Bitmaps
@@ -30,6 +30,7 @@ typedef struct {
     float y;
     int tiles[TILE_COUNT];
     int decorations[TILE_COUNT];
+    int flip[TILE_COUNT]; // Decoration flips
     bool exist;
 }
 PLATFORM;
@@ -47,8 +48,11 @@ static void create_platform() {
     const int MAX_HOLE_LENGTH = 5;
     const int MAX_GROUND_LENGTH = 6;
 
-    const int BRIDGE_PROB = 5;
+    const int BRIDGE_PROB = 4;
     const int BIG_PROB = 3;
+    const int TALL_PROB = 3;
+    const int LOW_PROB = 3;
+    const int SMALL_PROB = 2;
 
     // Find the first platform that is not in the game
     int i = 0;
@@ -61,10 +65,11 @@ static void create_platform() {
     }
     int p = i;
 
-    // Clear decorations
+    // Clear decorations (and set flippings)
     for(i = 0; i < TILE_COUNT; ++ i) {
 
-        platforms[p].decorations[i] = 0;
+        platforms[p].decorations[i] = -1;
+        platforms[p].flip[i] = rand() % 2;
     }
 
     // Add holes
@@ -72,12 +77,13 @@ static void create_platform() {
     bool isHole =false;
     int bridgeBuilt =0;
     int decorationPos = 0;
-    int end;
+    bool created = false;
 
     for(i = 0; i < TILE_COUNT; ++ i) {
-
+        
         if(-- count == 0) {
 
+            created = false;
             isHole = !isHole;
 
             // Calculate hole/platform size
@@ -93,18 +99,55 @@ static void create_platform() {
 
             else {
 
-                if(isHole && bridgeBuilt == 0 && rand() % BRIDGE_PROB == 0) {
+                if(count < MAX_GROUND_LENGTH && 
+                    isHole && bridgeBuilt == 0 && rand() % BRIDGE_PROB == 0) {
 
                     bridgeBuilt = 1;
                 }
             }
 
-            // Add big element
-            end = count - 4;
-            if(i < TILE_COUNT-1 - end && !isHole && count >= 4 && rand() % BIG_PROB == 0) {
+            // Add decorations
+            if(!isHole) {
 
-                decorationPos = i + rand() % (end+2);
-                platforms[p].decorations[decorationPos] = 3 + 2 + rand() % 2;
+                // Add big element
+                if(count >= 4 && rand() % BIG_PROB == 0) {
+
+                    decorationPos = i + rand() % (count - 4 +2);
+                    if(decorationPos > TILE_COUNT-1)
+                        decorationPos = TILE_COUNT-1;
+
+                    platforms[p].decorations[decorationPos] = 3 + 2 + rand() % 2;
+                    created = true;
+                }
+                else if(count >= 3) {
+                    
+                    decorationPos = i + rand() % (count-3 +2);
+                    if(decorationPos > TILE_COUNT-1)
+                            decorationPos = TILE_COUNT-1;
+
+                    // Or tall element
+                    if(rand() % TALL_PROB == 0) {
+
+                        platforms[p].decorations[decorationPos] = 3 + rand() % 2;
+                        created = true;
+                    }
+                    // Or low element
+                    else if(rand() % LOW_PROB == 0) {
+
+                        platforms[p].decorations[decorationPos] = 3 + 2 + 2 + rand() % 2;
+                        created = true;
+                    }
+
+                }
+                // Or small element
+                if(!created && rand() % SMALL_PROB == 0) {
+
+                    decorationPos = i + rand() % (count);
+                    if(decorationPos > TILE_COUNT-1)
+                            decorationPos = TILE_COUNT-1;
+
+                    platforms[p].decorations[decorationPos] = rand() % 3;
+                }
             }
         }
 
@@ -114,7 +157,7 @@ static void create_platform() {
         else
             platforms[p].tiles[i] = 2;
     }
-    platforms[p].y = 192 +32;
+    platforms[p].y = 192 +48;
     platforms[p].exist = true;
 
 }
@@ -142,14 +185,37 @@ static void update_platforms(float tm) {
 
 
 // Draw a decoration
-static void draw_decoration(int id, int x, int y) {
+static void draw_decoration(int id, int x, int y, int flip) {
 
     switch(id) {
 
+    // Small
+    case 0:
+    case 1:
+    case 2:
+
+        draw_bitmap_region(bmpPlatforms,256-16,id*16,16,16,x*16,y-16, flip);
+        break;
+
+    // Tall
+    case 3:
+    case 4:
+
+        draw_bitmap_region(bmpPlatforms,160 + (id-3)*32,0,32,48,x*16,y-48, flip);
+        break;
+
+    // Big
     case 5:
     case 6:
 
-        draw_bitmap_region(bmpPlatforms,32 + (id-5)*48,16,48,32,x*16,y-32, 0);
+        draw_bitmap_region(bmpPlatforms,32 + (id-5)*48,16,48,32,x*16,y-32, flip);
+        break;
+
+    // Low
+    case 7:
+    case 8:
+
+        draw_bitmap_region(bmpPlatforms,0,16 + (id-7)*16,32,16,x*16,y-16, flip);
         break;
 
     default:
@@ -166,15 +232,9 @@ static void draw_platform(PLATFORM* p) {
     bool left, right;
     int tile =0;
 
-    // Draw decorations
-    for(; i < TILE_COUNT; ++ i) {
-
-        if(p->decorations[i] != 0)
-            draw_decoration(p->decorations[i], i, p->y);
-    }
 
     // Draw bridge
-    for(i = 0; i < TILE_COUNT; ++ i) {
+    for(; i < TILE_COUNT; ++ i) {
 
         if(p->tiles[i] == 2) {
 
@@ -193,6 +253,13 @@ static void draw_platform(PLATFORM* p) {
 
             draw_bitmap_region(bmpPlatforms,6*16,0,16,16, i*16, y, 0);
         }
+    }
+
+    // Draw decorations
+    for(i = 0; i < TILE_COUNT; ++ i) {
+
+        if(p->decorations[i] != -1)
+            draw_decoration(p->decorations[i], i, p->y, p->flip[i]);
     }
 
     // Draw ground
