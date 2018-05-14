@@ -113,29 +113,30 @@ static void create_platform() {
                 if(count >= 4 && rand() % BIG_PROB == 0) {
 
                     decorationPos = i + rand() % (count - 4 +2);
-                    if(decorationPos > TILE_COUNT-1)
-                        decorationPos = TILE_COUNT-1;
-
-                    platforms[p].decorations[decorationPos] = 3 + 2 + rand() % 2;
-                    created = true;
+                    if(decorationPos <= TILE_COUNT-4) {
+    
+                        platforms[p].decorations[decorationPos] = 6 + rand() % 3;
+                        created = true;
+                    }
                 }
                 else if(count >= 3) {
                     
                     decorationPos = i + rand() % (count-3 +2);
-                    if(decorationPos > TILE_COUNT-1)
-                            decorationPos = TILE_COUNT-1;
+                    if(decorationPos <= TILE_COUNT-3) {
 
-                    // Or tall element
-                    if(rand() % TALL_PROB == 0) {
+                        // Or tall element
+                        if(rand() % TALL_PROB == 0) {
 
-                        platforms[p].decorations[decorationPos] = 3 + rand() % 2;
-                        created = true;
-                    }
-                    // Or low element
-                    else if(rand() % LOW_PROB == 0) {
+                            platforms[p].decorations[decorationPos] = 3 + rand() % 3;
+                            created = true;
+                        }
+                        // Or low element
+                        else if(rand() % LOW_PROB == 0) {
 
-                        platforms[p].decorations[decorationPos] = 3 + 2 + 2 + rand() % 2;
-                        created = true;
+                            platforms[p].decorations[decorationPos] = 9 + rand() % 3;
+                            created = true;
+                        }
+
                     }
 
                 }
@@ -194,28 +195,31 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 1:
     case 2:
 
-        draw_bitmap_region(bmpPlatforms,256-16,id*16,16,16,x*16,y-16, flip);
+        draw_bitmap_region(bmpPlatforms,32+id*16,48,16,16,x*16,y-16, flip);
         break;
 
     // Tall
     case 3:
     case 4:
+    case 5:
 
-        draw_bitmap_region(bmpPlatforms,160 + (id-3)*32,0,32,48,x*16,y-48, flip);
+        draw_bitmap_region(bmpPlatforms,176 + (id-3)*32,0,32,48,x*16,y-48, flip);
         break;
 
     // Big
-    case 5:
     case 6:
-
-        draw_bitmap_region(bmpPlatforms,32 + (id-5)*48,16,48,32,x*16,y-32, flip);
-        break;
-
-    // Low
     case 7:
     case 8:
 
-        draw_bitmap_region(bmpPlatforms,0,16 + (id-7)*16,32,16,x*16,y-16, flip);
+        draw_bitmap_region(bmpPlatforms,32 + (id-6)*48,16,48,32,x*16,y-32, flip);
+        break;
+
+    // Low
+    case 9:
+    case 10:
+    case 11:
+
+        draw_bitmap_region(bmpPlatforms,0,16 + (id-9)*16,32,16,x*16,y-16, flip);
         break;
 
     default:
