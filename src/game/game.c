@@ -5,14 +5,25 @@
 #include "game.h"
 
 #include "stage.h"
+#include "goat.h"
+#include "camera.h"
 
 #include "../global.h"
 #include "../vpad.h"
 
 #include "../include/system.h"
 
+// Constants
+static const float INITIAL_GLOBAL_SPEED = 0.5f;
+
 // Bitmaps
 static BITMAP* bmpFont;
+
+// Global speed
+static float globalSpeed;
+
+// Game objects
+static GOAT player;
 
 
 // Initialize
@@ -24,6 +35,8 @@ static int game_init() {
 
     // Initialize components
     stage_init(ass);
+    init_goat(ass);
+    init_global_camera();
 
     // Reset
     game_reset();
@@ -36,18 +49,29 @@ static int game_init() {
 static void game_update(float tm) {
 
     // Update components
-    stage_update(tm);
+    stage_update(globalSpeed, tm);
+    goat_update(&player, tm);
+    stage_goat_collision(&player);
+
+    // Move camera
+    move_camera(globalSpeed, tm);
 }
 
 
 // Draw
 static void game_draw() {
 
+    // Reset translation
+    translate(0, 0);
+
     // Clear screen
     clear(0b10110111);
 
     // Draw components
     stage_draw();
+
+    use_global_camera();
+    goat_draw(&player);
 }
 
 
@@ -67,7 +91,12 @@ static void game_on_change() {
 // Reset
 void game_reset() {
 
+    // Set default values
+    globalSpeed = INITIAL_GLOBAL_SPEED;
+    get_global_camera()->pos = vec2(0, 0);
 
+    // (Re)create game objects
+    player = create_goat(vec2(128.0f,192.0f - 18.0f));
 }
 
 

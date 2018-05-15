@@ -14,8 +14,14 @@ typedef struct {
     VEC2 pos;
     VEC2 speed;
     VEC2 target;
+    float oldY;
+    float dashTimer;
 
     SPRITE spr;
+    int flip;
+
+    bool canJump;
+    bool dashing;
 }
 GOAT;
 
@@ -30,5 +36,8 @@ void goat_update(GOAT* g, float tm);
 
 // Draw goat
 void goat_draw(GOAT* g);
+
+// Goat-to-floor collision
+void goat_floor_collision(GOAT* g, float x, float y, float w);
 
 #endif // __GOAT__

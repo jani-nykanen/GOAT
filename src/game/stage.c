@@ -4,6 +4,8 @@
 
 #include "stage.h"
 
+#include "camera.h"
+
 #include "../include/renderer.h"
 #include "../include/std.h"
 
@@ -11,7 +13,6 @@
 #define PLATFORM_COUNT 5
 #define TILE_COUNT 16
 static const float CLOUD_SPEED = 0.5f;
-static const float INITIAL_GLOBAL_SPEED = 1.0f;
 static const float PLATFORM_INTERVAL = 64.0f;
 
 // Bitmaps
@@ -22,7 +23,6 @@ static BITMAP* bmpPlatforms;
 
 // Cloud position
 static float cloudPos;
-static float globalSpeed;
 
 // Platform type
 typedef struct {
@@ -39,6 +39,21 @@ PLATFORM;
 static PLATFORM platforms[PLATFORM_COUNT];
 // Platform timer
 static float platTimer;
+
+
+// Create the first platform
+static void create_first_platform() {
+
+    PLATFORM* p = &platforms[0];
+    int i = 0;
+    for(; i < TILE_COUNT; ++ i) {
+
+        p->decorations[i] = -1;
+        p->tiles[i] = i >= 4 && i < TILE_COUNT-4 ? 1 : 0;
+    }
+    p->y = 192 +48 - 64;
+    p->exist = true;
+}
 
 
 // Create a new platform
@@ -165,7 +180,7 @@ static void create_platform() {
 
 
 // Update all platforms
-static void update_platforms(float tm) {
+static void update_platforms(float globalSpeed, float tm) {
 
     int i = 0;
     PLATFORM* p;
@@ -232,7 +247,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
 static void draw_platform(PLATFORM* p) {
 
     int i = 0;
-    int y = (int)floor(p->y);
+    int y = (int)floorf(p->y);
     bool left, right;
     int tile =0;
 
@@ -315,6 +330,24 @@ static void draw_platforms() {
 }
 
 
+// Goat-to-platform collision
+static void goat_platform_collision(GOAT* g, PLATFORM* p) {
+
+    if(p->exist == false) return;
+
+    float camY = get_global_camera()->pos.y;
+
+    int i = 0;
+    for(; i < TILE_COUNT; ++ i) {
+
+        if(p->tiles[i] != 0) {
+
+            goat_floor_collision(g, i*16,p->y + camY, 16);
+        }
+    }
+}
+
+
 // Initialize stage
 int stage_init(ASSET_PACK* ass) {
 
@@ -326,7 +359,6 @@ int stage_init(ASSET_PACK* ass) {
 
     // Set default values
     cloudPos = 0.0f;
-    globalSpeed = INITIAL_GLOBAL_SPEED;
     platTimer = PLATFORM_INTERVAL;
 
     int i = 0;
@@ -338,12 +370,15 @@ int stage_init(ASSET_PACK* ass) {
     // Set seed
     srand(time(NULL));
 
+    // Create the first platform
+    create_first_platform();
+
     return 0;
 }
 
 
 // Update stage
-void stage_update(float tm) {
+void stage_update(float globalSpeed, float tm) {
 
     // Make the clouds move again
     cloudPos -= CLOUD_SPEED * tm;
@@ -361,7 +396,7 @@ void stage_update(float tm) {
     }
 
     // Update platforms
-    update_platforms(tm);
+    update_platforms(globalSpeed, tm);
 }
 
 
@@ -391,4 +426,15 @@ void stage_draw() {
 
     // Draw platforms
     draw_platforms();
+}
+
+
+// Stage-to-goat collision
+void stage_goat_collision(GOAT* g) {
+
+    int i = 0;
+    for(; i < PLATFORM_COUNT; ++ i) {
+
+        goat_platform_collision(g, &platforms[i]);
+    }
 }
