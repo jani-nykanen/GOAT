@@ -8,6 +8,21 @@
 #include "../include/renderer.h"
 #include "../include/system.h"
 
+// Cloud count
+#define CLOUD_COUNT 16
+
+// Cloud
+typedef struct {
+
+    VEC2 pos;
+    float timer;    
+    bool exist;
+    int frame;
+    int row;
+    int flip;
+}
+CLOUD;
+
 // Goat type
 typedef struct {
 
@@ -22,6 +37,9 @@ typedef struct {
 
     bool canJump;
     bool dashing;
+
+    CLOUD clouds[CLOUD_COUNT];
+    float cloudTimer;
 }
 GOAT;
 

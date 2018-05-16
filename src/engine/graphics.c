@@ -414,6 +414,83 @@ void draw_bitmap_region(BITMAP* bmp, int sx, int sy, int sw, int sh,
 }
 
 
+// Draw a "fading" bitmap
+// (For performance reasons I don't add one "super method" for
+//  both this and normal region drawing)
+void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh, 
+        int dx, int dy, int flip, 
+        int fade, Uint8 color) {
+
+    if(bmp == NULL) return;
+
+    dx += tr.x;
+    dy += tr.y;
+
+    // Clip
+    if(!clip(bmp,&dx,&dy,&sx,&sy,&sw,&sh, flip))
+        return;
+
+    bool hflip = (flip & FLIP_H) != 0;
+    bool vflip = (flip & FLIP_V) != 0;
+
+    int offset = dy * gframe->width + dx;
+    int pixel = sy * bmp->width + sx; 
+    int pjump = bmp->width - sw;
+
+    if(vflip) {
+
+        offset += (sh-1) * gframe->width;
+    }
+
+    if(hflip) {
+
+        offset += sw;
+    }
+
+    int x,y;
+    for(y=0; y < sh; ++ y) {
+
+        for(x=0; x <  sw; ++ x) {
+        
+            if(pixel >= bmp->width*bmp->height)
+                return;
+
+            if(bmp->data[pixel ++] != alpha && offset >= 0) {
+
+                if(x % fade != 0 && y % fade != 0)
+                    gframe->data[offset] = color;
+
+            }
+
+            if(hflip)
+                -- offset;
+            else
+                ++ offset;
+        }
+        pixel += pjump;
+
+        if(hflip) {
+
+            offset += sw * 2;
+        }
+
+        offset -= sw;
+
+        if(vflip) {
+
+            offset -= gframe->width; 
+        }
+        else {
+
+            offset += gframe->width; 
+        }
+        
+        
+    }
+
+}
+
+
 // Faster rendering routine (no alpha or flipping)
 void draw_bitmap_fast(BITMAP* bmp, int dx, int dy) {
 

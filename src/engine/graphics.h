@@ -56,6 +56,9 @@ void draw_bitmap(BITMAP* bmp, int x, int y, int flip);
 // Draw a bitmap region
 void draw_bitmap_region(BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip);
 
+// Draw a "fading" bitmap
+void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip, int fade, Uint8 color);
+
 // Faster routine for drawing a bitmap (no alpha or flipping)
 void draw_bitmap_fast(BITMAP* bmp, int x, int y);
 
