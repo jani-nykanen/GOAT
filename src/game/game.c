@@ -97,6 +97,9 @@ void game_reset() {
 
     // (Re)create game objects
     player = create_goat(vec2(128.0f,192.0f - 18.0f));
+
+    // Reset stage
+    stage_reset();
 }
 
 

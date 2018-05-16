@@ -357,21 +357,11 @@ int stage_init(ASSET_PACK* ass) {
     bmpMountains = (BITMAP*)assets_get(ass, "mountains");
     bmpPlatforms = (BITMAP*)assets_get(ass, "platforms");
 
-    // Set default values
-    cloudPos = 0.0f;
-    platTimer = PLATFORM_INTERVAL;
-
-    int i = 0;
-    for(; i < PLATFORM_COUNT; ++ i) {
-
-        platforms[i].exist = false;
-    }
-
     // Set seed
     srand(time(NULL));
 
-    // Create the first platform
-    create_first_platform();
+    // Reset
+    stage_reset();
 
     return 0;
 }
@@ -437,4 +427,22 @@ void stage_goat_collision(GOAT* g) {
 
         goat_platform_collision(g, &platforms[i]);
     }
+}
+
+
+// Reset the stage
+void stage_reset() {
+
+    // Set default values
+    cloudPos = 0.0f;
+    platTimer = PLATFORM_INTERVAL;
+
+    int i = 0;
+    for(; i < PLATFORM_COUNT; ++ i) {
+
+        platforms[i].exist = false;
+    }
+
+    // Create the first platform
+    create_first_platform();
 }

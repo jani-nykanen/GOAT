@@ -4,6 +4,9 @@
 
 #include "goat.h"
 
+#include "game.h"
+#include "camera.h"
+
 #include "../vpad.h"
 
 #include "../include/std.h"
@@ -38,7 +41,7 @@ static void update_cloud(CLOUD* g, float tm) {
 static void generate_clouds(GOAT* g, float tm) {
 
     const float CLOUD_TIMER_LIMIT = 6.0f;
-    const float DELTA = 0.1f;
+    const float DELTA = 0.25f;
 
     // Update clouds
     int i = 0;
@@ -106,11 +109,10 @@ static void control_goat(GOAT* g) {
     }
 
     // Dash
-    g->dashing = (!g->canJump && vpad_get_button(1) == STATE_DOWN);
-    if(g->dashing && (vpad_get_button(1) == STATE_UP || vpad_get_button(1) == STATE_RELEASED))  {
+    g->dashing = (g->dashTimer < DASH_TIMER_MAX && !g->canJump && vpad_get_button(1) == STATE_DOWN);
+    if(!g->dashing && g->dashTimer > 0.0f)  {
 
         g->dashTimer = DASH_TIMER_MAX;
-        g->dashing = false;
     }
 }
 
@@ -188,8 +190,8 @@ static void animate_goat(GOAT* g, float tm) {
     // Dashing
     if(g->dashing) {
 
-        g->spr.frame = 5;
-        g->spr.row = 1;
+        if(!(g->spr.frame == 2 && g->spr.row == 2))
+            spr_animate(&g->spr,2,0,2,6, tm);
     }
     // Running
     else if(g->canJump) {
@@ -252,6 +254,14 @@ static void draw_cloud(CLOUD* c) {
 }
 
 
+
+// Draw a "single" goat
+static void draw_single_goat(GOAT* g, int x, int y) {
+
+    spr_draw(&g->spr,bmpGoat,x,y, g->flip);
+}
+
+
 // Initialize goats
 void init_goat(ASSET_PACK* ass) {
 
@@ -288,12 +298,21 @@ GOAT create_goat(VEC2 p) {
 // Update goat
 void goat_update(GOAT* g, float tm) {
 
+    const float DELTA = -0.1f;
+
     control_goat(g);
     move_goat(g, tm);
     animate_goat(g, tm);
     generate_clouds(g, tm);
 
     g->canJump = false;
+
+    // Death
+    int camY = (int)get_global_camera()->pos.y;
+    if(g->pos.y > camY+192+24 || (g->speed.y >= DELTA && g->pos.y <= camY) ) {
+
+        game_reset();
+    }
 }
 
 
@@ -311,16 +330,16 @@ void goat_draw(GOAT* g) {
     }
 
     // "Original"
-    spr_draw(&g->spr,bmpGoat,x,y, g->flip);
+    draw_single_goat(g,x,y);
 
     // "Outsider"
     if(g->pos.x < g->spr.w/2) {
 
-        spr_draw(&g->spr,bmpGoat,x + 256,y, g->flip);
+        draw_single_goat(g,x +256,y);
     }
     if(g->pos.x > 256- g->spr.w/2) {
 
-        spr_draw(&g->spr,bmpGoat,x - 256,y, g->flip);
+        draw_single_goat(g,x -256,y);
     }
 }
 

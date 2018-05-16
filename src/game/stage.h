@@ -25,4 +25,7 @@ void stage_draw();
 // Stage-to-goat collision
 void stage_goat_collision(GOAT* g);
 
+// Reset the stage
+void stage_reset();
+
 #endif // __STAGE__
