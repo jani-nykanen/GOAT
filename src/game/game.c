@@ -7,6 +7,7 @@
 #include "stage.h"
 #include "goat.h"
 #include "camera.h"
+#include "status.h"
 
 #include "../global.h"
 #include "../vpad.h"
@@ -37,6 +38,7 @@ static int game_init() {
     stage_init(ass);
     init_goat(ass);
     init_global_camera();
+    init_status(ass);
 
     // Reset
     game_reset();
@@ -52,6 +54,7 @@ static void game_update(float tm) {
     stage_update(globalSpeed, tm);
     goat_update(&player, tm);
     stage_goat_collision(&player);
+    status_update(tm);
 
     // Move camera
     move_camera(globalSpeed, tm);
@@ -72,6 +75,10 @@ static void game_draw() {
 
     use_global_camera();
     goat_draw(&player);
+
+    // Draw status
+    translate(0, 0);
+    status_draw();
 }
 
 
@@ -98,8 +105,9 @@ void game_reset() {
     // (Re)create game objects
     player = create_goat(vec2(128.0f,192.0f - 18.0f));
 
-    // Reset stage
+    // Reset components
     stage_reset();
+    reset_status();
 }
 
 
