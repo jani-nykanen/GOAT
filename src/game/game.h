@@ -15,5 +15,8 @@ void game_reset();
 // Get game scene
 SCENE game_get_scene();
 
+// Add a gem to the game world
+void add_gem(float x, float y);
+
 #endif // __GAME__
 

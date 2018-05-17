@@ -437,6 +437,8 @@ void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh,
     int pixel = sy * bmp->width + sx; 
     int pjump = bmp->width - sw;
 
+    bool useBmp = color == alpha;
+
     if(vflip) {
 
         offset += (sh-1) * gframe->width;
@@ -457,8 +459,10 @@ void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh,
 
             if(bmp->data[pixel ++] != alpha && offset >= 0) {
 
-                if(x % fade != 0 && y % fade != 0)
-                    gframe->data[offset] = color;
+                if(x % fade != 0 && y % fade != 0) {
+
+                    gframe->data[offset] = useBmp ? bmp->data[pixel -1] : color;
+                }
 
             }
 

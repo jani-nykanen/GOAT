@@ -5,6 +5,8 @@
 #include "stage.h"
 
 #include "camera.h"
+#include "game.h"
+#include "status.h"
 
 #include "../include/renderer.h"
 #include "../include/std.h"
@@ -32,6 +34,7 @@ typedef struct {
     int decorations[TILE_COUNT];
     int flip[TILE_COUNT]; // Decoration flips
     bool exist;
+    bool scored;
 }
 PLATFORM;
 
@@ -53,6 +56,29 @@ static void create_first_platform() {
     }
     p->y = 192 +48 - 64;
     p->exist = true;
+}
+
+
+// Add objects to a platform
+static void add_objects(float y) {
+
+    const int MAX_GEM = 4;
+
+    int i = 0;
+    float camY = get_global_camera()->pos.y;
+
+    // How many
+    int count = rand() % MAX_GEM;
+    if(count > 0) {
+
+        // Position
+        int pos = rand() % (10 - count-1);
+        for(i = 0; i < count; ++ i, ++ pos) {
+
+            // Add a gem
+            add_gem(8.0f + pos*24.0f + 12.0f,camY + y- 24.0f);
+        }
+    }
 }
 
 
@@ -79,6 +105,7 @@ static void create_platform() {
         }
     }
     int p = i;
+    platforms[p].scored = false;
 
     // Clear decorations (and set flippings)
     for(i = 0; i < TILE_COUNT; ++ i) {
@@ -173,8 +200,12 @@ static void create_platform() {
         else
             platforms[p].tiles[i] = 2;
     }
-    platforms[p].y = 192 +48;
+    float y = 192 +48;
+    platforms[p].y = y;
     platforms[p].exist = true;
+
+    // Add objects
+    add_objects(y);
 
 }
 
@@ -343,6 +374,13 @@ static void goat_platform_collision(GOAT* g, PLATFORM* p) {
         if(p->tiles[i] != 0) {
 
             goat_floor_collision(g, i*16,p->y + camY, 16);
+
+            // If below the platform and not scored, score
+            if(g->pos.y > p->y+camY+16 && !p->scored) {
+
+                status_add_score();
+                p->scored = true;
+            }
         }
     }
 }

@@ -10,6 +10,7 @@
 // Constants
 static float HEALTH_FADE_MAX = 30.0f;
 static int HEALTH_MAX = 3;
+static int SCORE_BASE = 10;
 
 // Status variables
 static int health;
@@ -22,6 +23,29 @@ static int coins;
 static BITMAP* bmpHUD;
 static BITMAP* bmpFont;
 static BITMAP* bmpFontBig;
+
+
+// Get score string
+static void get_score_string(char* buf, int bufLen) {
+
+    char zeroes[6];
+
+    // Add zeroes
+    int i = 4;
+    int p = 0;
+    for(; score < (unsigned int)pow(10, i); -- i ) {
+
+        zeroes[p ++] = '0';
+    }
+    zeroes[p] = '\0';
+
+    // Create score string
+    if(score > 0)
+        snprintf(buf, bufLen, "%s%d", zeroes, score);
+
+    else
+        snprintf(buf, bufLen, "%s", zeroes); 
+}
 
 
 // Initialize status
@@ -76,6 +100,7 @@ void status_draw() {
 
     int i = 0;
     int sx = 0;
+    char str[16];
 
     // Draw hearts
     for(; i < HEALTH_MAX; ++ i) {
@@ -87,13 +112,13 @@ void status_draw() {
     }
 
     // Draw score
+    get_score_string(str, 16);
     draw_text(bmpFont, " SCORE:", 128, SCORE_TEXT_Y, -6, 0, true);
-    draw_text(bmpFontBig, "00000", 128, SCORE_Y, -15, 0, true);
+    draw_text(bmpFontBig, str, 128, SCORE_Y, -16, 0, true);
 
     // Draw coins
-    char str[16];
     snprintf(str, 16, "~%d", coins);
-    draw_text(bmpFontBig, str, COIN_TEXT_X, COIN_TEXT_Y, -15, 0, false);
+    draw_text(bmpFontBig, str, COIN_TEXT_X, COIN_TEXT_Y, -16, 0, false);
     draw_bitmap_region(bmpHUD,48,0,24,24, COIN_X, COINT_Y, 0);
 
 }
@@ -117,5 +142,5 @@ void status_add_coin() {
 // Add score
 void status_add_score() {
 
-    ++ score;
+    score += SCORE_BASE + coins;
 }
