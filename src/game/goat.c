@@ -6,6 +6,7 @@
 
 #include "game.h"
 #include "camera.h"
+#include "status.h"
 
 #include "../vpad.h"
 
@@ -20,6 +21,7 @@ static const float GOAT_JUMP = -2.5f;
 static const float GOAT_DASH_SPEED = 3.5f;
 static const float DASH_TIMER_MAX = 20.0f;
 static const float CLOUD_LIMIT = 30.0f;
+static const float HURT_TIME = 60.0f;
 
 // Bitmaps
 static BITMAP* bmpGoat;
@@ -258,7 +260,30 @@ static void draw_cloud(CLOUD* c) {
 // Draw a "single" goat
 static void draw_single_goat(GOAT* g, int x, int y) {
 
-    spr_draw(&g->spr,bmpGoat,x,y, g->flip);
+    if(g->flip == FLIP_NONE)
+        ++ x;
+    else
+        -- x;
+
+    if(g->hurtTimer <= 0.0f || (int)floor(g->hurtTimer/4) % 2 == 0)
+        spr_draw(&g->spr,bmpGoat,x,y, g->flip);
+
+    else {
+
+        int sx = g->spr.frame * 32;
+        int sy = g->spr.row * 32;
+        int sw = g->spr.w;
+        int sh = g->spr.h;
+
+        draw_bitmap_region_fading(bmpGoat,sx,sy,sw,sh,x,y, g->flip,2,get_alpha());
+    }
+}
+
+
+// Get hurt
+static bool hurt(VEC2 p, float dimx, float dimy, float x, float y, float w, float h) {
+
+    return (p.x+dimx >= x && p.x-dimx <= x+w && p.y >= y && p.y-dimy <= y+h);
 }
 
 
@@ -284,6 +309,7 @@ GOAT create_goat(VEC2 p) {
     g.canJump = true;
     g.dashing = false;
     g.dashTimer = 0.0f;
+    g.hurtTimer = 0.0f;
 
     int i = 0;
     for(; i < CLOUD_COUNT; ++ i) {
@@ -306,6 +332,10 @@ void goat_update(GOAT* g, float tm) {
     generate_clouds(g, tm);
 
     g->canJump = false;
+
+    // Hurt timer
+    if(g->hurtTimer > 0.0f)
+        g->hurtTimer -= 1.0f * tm;
 
     // Death
     int camY = (int)get_global_camera()->pos.y;
@@ -359,5 +389,24 @@ void goat_floor_collision(GOAT* g, float x, float y, float w) {
             g->canJump = true;
             g->dashTimer = 0.0f;
         }
+    }
+}
+
+
+// Hurt collision
+void goat_hurt_collision(GOAT* g, float x, float y, float w, float h) {
+
+    const float DIM_X = 8.0f;
+    const float DIM_Y = 16.0f;
+
+    if(g->hurtTimer > 0.0f) return;
+
+    // Check if inside the actual goat or those "off-screen entities"
+    if(hurt(g->pos,DIM_X,DIM_Y,x,y,w,h)
+    || hurt(vec2(g->pos.x + 256, g->pos.y),DIM_X,DIM_Y,x,y,w,h)
+    || hurt(vec2(g->pos.x - 256, g->pos.y),DIM_X,DIM_Y,x,y,w,h) ) {
+
+        g->hurtTimer = HURT_TIME;
+        status_reduce_health();
     }
 }

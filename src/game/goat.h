@@ -30,7 +30,9 @@ typedef struct {
     VEC2 speed;
     VEC2 target;
     float oldY;
+    
     float dashTimer;
+    float hurtTimer;
 
     SPRITE spr;
     int flip;
@@ -57,5 +59,8 @@ void goat_draw(GOAT* g);
 
 // Goat-to-floor collision
 void goat_floor_collision(GOAT* g, float x, float y, float w);
+
+// Hurt collision
+void goat_hurt_collision(GOAT* g, float x, float y, float w, float h);
 
 #endif // __GOAT__

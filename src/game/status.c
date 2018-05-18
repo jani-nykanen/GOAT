@@ -103,10 +103,20 @@ void status_draw() {
     // Draw hearts
     for(; i < HEALTH_MAX; ++ i) {
 
-        sx = health >= i ? 24 : 0;
+        sx = health-1 >= i ? 24 : 0;
 
         draw_bitmap_region(bmpHUD, sx,0,24,24, 
             HEART_X + HEART_DELTA*i, HEART_Y, 0 );
+    }
+
+    // Draw a fading heart
+    if(healthFade) {
+
+        int fade = 1 + (int)floorf(healthFadeTimer / HEALTH_FADE_MAX * 8.0f);
+        sx = 24;
+
+        draw_bitmap_region_fading(bmpHUD, sx,0,24,24, 
+            HEART_X + HEART_DELTA*(health), HEART_Y, 0, fade, get_alpha() );
     }
 
     // Draw score
@@ -137,6 +147,7 @@ void status_reduce_health() {
 
     -- health;
     healthFadeTimer = HEALTH_FADE_MAX;
+    healthFade = true;
 }
 
 

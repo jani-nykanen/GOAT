@@ -15,6 +15,7 @@ typedef struct {
 
     VEC2 pos;
     VEC2 speed;
+    VEC2 deathSpeed;
     
     int id;
     int flip;
@@ -25,6 +26,7 @@ typedef struct {
     float rightLimit;
 
     bool exist;
+    bool stomped;
     float deathTimer;
 }
 MONSTER;

@@ -4,11 +4,15 @@
 
 #include "monster.h"
 
+#include "camera.h"
+
 #include "../include/std.h"
 
 // Constants
-static const float DEATH_MAX = 30.0f;
+static const float DEATH_MAX = 20.0f;
 static const float WALKER_SPEED = 0.5f;
+static const float DEATH_GRAVITY = 0.25f;
+static const float DEATH_SPEED_Y = -3.0f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
@@ -51,6 +55,12 @@ static void move_monster(MONSTER* m, float tm) {
         m->pos.x = m->rightLimit -8.0f;
     }
 
+    // If "too high", die
+    if(m->pos.y+1 < get_global_camera()->pos.y) {
+
+        m->exist = false;
+        m->deathTimer = -1.0f;
+    }
 }
 
 
@@ -67,6 +77,14 @@ static void animate_monster(MONSTER* m, float tm) {
     default:
         break;
     }
+}
+
+
+// Draw fading
+static void draw_fading(int sx, int sy, int x, int y, int fade, int flip) {
+
+    draw_bitmap_region_fading(bmpMonsters,sx,sy,
+                32,32,x,y, flip, fade, get_alpha());
 }
 
 
@@ -110,6 +128,11 @@ void monster_update(MONSTER* m, float tm) {
         if(m->deathTimer > 0.0f) {
 
             m->deathTimer -= 1.0f * tm;
+            m->pos.x += m->deathSpeed.x *tm;
+            m->pos.y += m->deathSpeed.y *tm;
+
+            if(!m->stomped)
+                m->deathSpeed.y += DEATH_GRAVITY * tm;
         }
         return;
     }
@@ -135,8 +158,13 @@ void monster_draw(MONSTER* m) {
         if(m->deathTimer > 0.0f) {
 
             int fade = 1+ (int)roundf(m->deathTimer / DEATH_MAX * 8.0f);
-            draw_bitmap_region_fading(bmpMonsters,0,m->id*32,
-                32,32,x,y, m->flip, fade, get_alpha());
+
+            draw_fading(0, m->id,x,y,fade, m->flip);
+            if(m->pos.x < 0.0f)
+                draw_fading(0, m->id,x+256,y,fade, m->flip);
+
+            else if(m->pos.x > 256.0f)
+                draw_fading(0, m->id,x-256,y,fade, m->flip);  
         }   
         return;
     }
@@ -165,9 +193,41 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
 
             m->exist = false;
             m->deathTimer = DEATH_MAX;
+            m->deathSpeed = vec2(0, 0);
+            m->stomped = true;
 
             g->speed.y = GOAT_JUMP_BACK;
+
+            return;
         }
 
     }
+
+    // Ram collision
+    if(g->dashing) {
+
+        // If coming from the correct direction
+        if( (g->speed.x > 0.0f && g->pos.x < m->pos.x) 
+        || (g->speed.x < 0.0f && g->pos.x > m->pos.x)) {
+
+
+            // If inside the collision area
+            if(g->pos.x+12.0f >= m->pos.x-8.0f && g->pos.x-12.0f <= m->pos.x+8.0f
+            && g->pos.y >= m->pos.y-16 && g->pos.y-16.0f <= m->pos.y ) {
+
+                m->exist = false;
+                m->deathTimer = DEATH_MAX;
+                m->stomped = false;
+
+                m->deathSpeed.x = g->speed.x * 2.0f;
+                m->deathSpeed.y = DEATH_SPEED_Y;
+
+                return;
+            }
+
+        }
+    }
+
+    // Hurt collision
+    goat_hurt_collision(g, m->pos.x-8.0f,m->pos.y-16.0f,16.0f,16.0f);
 }
