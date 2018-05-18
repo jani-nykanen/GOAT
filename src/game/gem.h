@@ -14,11 +14,14 @@
 typedef struct {
 
     VEC2 pos;
+    VEC2 speed;
     SPRITE spr;
     bool exist;
+    bool hasGravity;
 
     float waveTimer;
     float deathTimer;
+    float oldY;
 }
 GEM;
 
@@ -28,6 +31,9 @@ void init_gems(ASSET_PACK* ass);
 // Create a gem
 GEM create_gem(VEC2 pos);
 
+// Create a gem with gravity
+GEM create_gem_with_gravity(VEC2 pos, VEC2 speed);
+
 // Update a gem
 void gem_update(GEM* gem, float tm);
 
@@ -36,6 +42,9 @@ void gem_draw(GEM* gem);
 
 // Gem-to-goat collision
 void gem_goat_collision(GEM* gem, GOAT* g);
+
+// Gem-to-floor collision
+void gem_floor_collision(GEM* g, float x, float y, float w);
 
 #endif // __GEM__
 

@@ -5,6 +5,7 @@
 #include "monster.h"
 
 #include "camera.h"
+#include "game.h"
 
 #include "../include/std.h"
 
@@ -14,6 +15,8 @@ static const float WALKER_SPEED = 0.5f;
 static const float DEATH_GRAVITY = 0.1f;
 static const float DEATH_SPEED_Y = -1.5f;
 static const float DEATH_SPEED_X_MUL = 1.25f;
+static const float GEM_SPEED_X_MUL = 1.0f;
+static const float GEM_SPEED_Y = -1.25f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
@@ -97,6 +100,16 @@ static void do_splash(MONSTER* m, float x, float y) {
 
     m->splash.count = 0;
     m->splash.frame = 0;
+}
+
+
+// Die
+static void monster_die(MONSTER* m, bool stomped) {
+
+    m->exist = false;
+    m->deathTimer = DEATH_MAX;
+    m->dying = true;
+    m->stomped = stomped;
 }
 
 
@@ -219,15 +232,13 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
         // If the goat is jumping over the monster
         if(g->speed.y > 0.0f && g->pos.y > m->pos.y-26.0f && g->pos.y < m->pos.y-16.0f) {
 
-            m->exist = false;
-            m->deathTimer = DEATH_MAX;
+            monster_die(m, true);
             m->deathSpeed = vec2(0, 0);
-            m->dying = true;
-            m->stomped = true;
 
             g->speed.y = GOAT_JUMP_BACK;
 
             do_splash(m, g->pos.x, m->pos.y-18);
+            add_gem_with_gravity(m->pos.x,m->pos.y-12.0f,0.0f,-0.5f);
 
             return;
         }
@@ -246,18 +257,18 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
             if(g->pos.x+12.0f >= m->pos.x-8.0f && g->pos.x-12.0f <= m->pos.x+8.0f
             && g->pos.y >= m->pos.y-16 && g->pos.y-16.0f <= m->pos.y ) {
 
-                m->exist = false;
-                m->deathTimer = DEATH_MAX;
-                m->dying = true;
-                m->stomped = false;
+                float speedx = g->speed.x;
 
-                m->deathSpeed.x = g->speed.x * DEATH_SPEED_X_MUL;
+                monster_die(m, false);
+
+                m->deathSpeed.x = speedx * DEATH_SPEED_X_MUL;
                 m->deathSpeed.y = DEATH_SPEED_Y;
 
                 g->speed.x = 0.0f;
                 goat_stop_dashing(g);
                 
                 do_splash(m,m->pos.x, g->pos.y -10.0f);
+                add_gem_with_gravity(m->pos.x,m->pos.y-12.0f,speedx* GEM_SPEED_X_MUL,GEM_SPEED_Y);
 
                 return;
             }
@@ -267,4 +278,32 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
 
     // Hurt collision
     goat_hurt_collision(g, m->pos.x-8.0f,m->pos.y-16.0f,16.0f,16.0f);
+}
+
+
+// Monster-to-monster collision
+void monster_to_monster_collision(MONSTER* m1, MONSTER* m2) {
+
+    if(m1->exist == false || m2->exist == false)
+        return;
+
+    // Check if vertically overlap
+    if(m1->pos.y > m2->pos.y-24 && m1->pos.y-24 < m2->pos.y) {
+
+        // Right-to-left
+        if(m1->pos.x > m2->pos.x && m1->speed.x < 0.0f && m1->pos.x < m2->pos.x+16.0f) {
+
+            m1->speed.x *= -1;
+            if(m2->speed.x > 0.0f)
+                m2->speed.x *= -1;
+        }
+        // Left-to-right
+        else 
+        if(m1->pos.x < m2->pos.x && m1->speed.x > 0.0f && m1->pos.x > m2->pos.x-16.0f) {
+
+            m1->speed.x *= -1;
+            if(m2->speed.x < 0.0f)
+                m2->speed.x *= -1;
+        }
+    }
 }

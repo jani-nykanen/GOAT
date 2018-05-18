@@ -50,4 +50,7 @@ void monster_draw(MONSTER* m);
 // Monster-to-goat collision
 void monster_goat_collision(MONSTER* m, GOAT* g);
 
+// Monster-to-monster collision
+void monster_to_monster_collision(MONSTER* m1, MONSTER* m2);
+
 #endif // __MONSTER__

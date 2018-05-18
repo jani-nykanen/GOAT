@@ -8,6 +8,7 @@
 #include "../include/system.h"
 
 #include "goat.h"
+#include "gem.h"
 
 // Initialize stage
 int stage_init(ASSET_PACK* ass);
@@ -24,6 +25,9 @@ void stage_draw();
 
 // Stage-to-goat collision
 void stage_goat_collision(GOAT* g);
+
+// Stage-to-gem collision
+void stage_gem_collision(GEM* g);
 
 // Reset the stage
 void stage_reset();

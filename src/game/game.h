@@ -18,6 +18,9 @@ SCENE game_get_scene();
 // Add a gem to the game world
 void add_gem(float x, float y);
 
+// Add a gem with a gravity to the game world
+void add_gem_with_gravity(float x, float y, float sx, float sy);
+
 // Add a monster to the game world
 void add_monster(float x, float y, float left, float right, int id);
 

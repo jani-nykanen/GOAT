@@ -22,7 +22,7 @@
 static const float INITIAL_GLOBAL_SPEED = 0.5f;
 static const float SPEED_UP_INTERVAL = 30.0f * 60.f;
 static const float SPEED_UP = 0.1f;
-static const int MAX_UP = 7;
+static const int MAX_UP = 10;
 
 // Bitmaps
 static BITMAP* bmpFont;
@@ -80,6 +80,7 @@ static int game_init() {
 static void game_update(float tm) {
 
     int i = 0;
+    int i2 = 0;
 
     // Update stage
     stage_update(globalSpeed, tm);
@@ -93,6 +94,7 @@ static void game_update(float tm) {
 
         gem_update(&gems[i], tm);
         gem_goat_collision(&gems[i], &player);
+        stage_gem_collision(&gems[i]);
     }
 
     // Update monsters
@@ -100,6 +102,12 @@ static void game_update(float tm) {
 
         monster_update(&monsters[i], tm);
         monster_goat_collision(&monsters[i], &player);
+
+        for(i2 = 0; i2 < MONSTER_COUNT; ++ i2) {
+
+            if(i2 == i) continue;
+            monster_to_monster_collision(&monsters[i], &monsters[i2]);
+        }
     }
 
     // Update status
@@ -198,6 +206,7 @@ SCENE game_get_scene() {
 
 
 // Add a gem to the game world
+// TODO: A method for "find first gem"
 void add_gem(float x, float y) {
 
     // Find the first gem that does not exist
@@ -207,6 +216,22 @@ void add_gem(float x, float y) {
         if(gems[i].exist == false && gems[i].deathTimer <= 0.0f) {
 
             gems[i] = create_gem(vec2(x, y));
+            return;
+        }
+    }
+}
+
+
+// Add a gem with a gravity to the game world
+void add_gem_with_gravity(float x, float y, float sx, float sy) {
+
+    // Find the first gem that does not exist
+    int i = 0;
+    for(; i < GEM_COUNT; ++ i) {
+
+        if(gems[i].exist == false && gems[i].deathTimer <= 0.0f) {
+
+            gems[i] = create_gem_with_gravity(vec2(x, y), vec2(sx, sy));
             return;
         }
     }

@@ -391,6 +391,7 @@ static void draw_platforms() {
 
 
 // Goat-to-platform collision
+// TODO: Merge this and the following method
 static void goat_platform_collision(GOAT* g, PLATFORM* p) {
 
     if(p->exist == false) return;
@@ -414,6 +415,23 @@ static void goat_platform_collision(GOAT* g, PLATFORM* p) {
     }
 }
 
+
+// Gem-to-platform collision
+static void gem_platform_collision(GEM* g, PLATFORM* p) {
+
+    if(p->exist == false) return;
+
+    float camY = get_global_camera()->pos.y;
+
+    int i = 0;
+    for(; i < TILE_COUNT; ++ i) {
+
+        if(p->tiles[i] != 0) {
+
+            gem_floor_collision(g, i*16,p->y + camY, 16);
+        }
+    }
+}
 
 // Initialize stage
 int stage_init(ASSET_PACK* ass) {
@@ -487,12 +505,26 @@ void stage_draw() {
 
 
 // Stage-to-goat collision
+// TODO: Merge this and the following
 void stage_goat_collision(GOAT* g) {
 
     int i = 0;
     for(; i < PLATFORM_COUNT; ++ i) {
 
         goat_platform_collision(g, &platforms[i]);
+    }
+}
+
+
+// Stage-to-gem collision
+void stage_gem_collision(GEM* g) {
+
+    if(g->hasGravity == false) return;
+
+    int i = 0;
+    for(; i < PLATFORM_COUNT; ++ i) {
+
+        gem_platform_collision(g, &platforms[i]);
     }
 }
 

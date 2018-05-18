@@ -13,6 +13,9 @@
 static const float AMPLITUDE = 4.0f;
 static const float WAVE_SPEED = 0.05f;
 static const float DEATH_MAX = 30.0f;
+static const float GEM_GRAVITY = 0.1f;
+static const float MAX_GRAVITY = 2.5f;
+static const float GEM_SLOW_X = 0.025f;
 
 // Bitmaps
 static BITMAP* bmpGem;
@@ -35,6 +38,20 @@ GEM create_gem(VEC2 pos) {
     g.waveTimer = (float)(rand() % 1000) / 1000.0f * 2 * M_PI;
     g.deathTimer = 0.0f;
     g.exist = true;
+    g.hasGravity = false;
+
+    return g;
+}
+
+
+// Create a gem with gravity
+GEM create_gem_with_gravity(VEC2 pos, VEC2 speed) {
+
+    GEM g = create_gem(pos);
+    g.hasGravity = true;
+    g.speed = speed;
+    g.waveTimer = 0.0f;
+    g.oldY = 0.0f;
 
     return g;
 }
@@ -54,14 +71,61 @@ void gem_update(GEM* gem, float tm) {
         return;   
     }
 
+    // Store old y coordinate
+    gem->oldY = gem->pos.y;
+
+    float camY = get_global_camera()->pos.y;
+
     // Wave
-    gem->waveTimer += WAVE_SPEED * tm;
+    if(!gem->hasGravity) {
+        gem->waveTimer += WAVE_SPEED * tm;
+
+    } 
+    else {
+
+        // Update gravity
+        gem->speed.y += GEM_GRAVITY * tm;
+        if(gem->speed.y > MAX_GRAVITY)
+            gem->speed.y = MAX_GRAVITY;
+
+        // Update horizontal speed
+        if(gem->speed.x > 0.0f) {
+
+            gem->speed.x -= GEM_SLOW_X * tm;
+            if(gem->speed.x < 0.0f)
+                gem->speed.x = 0.0f;
+        }
+        else if(gem->speed.x < 0.0f) {
+
+            gem->speed.x += GEM_SLOW_X * tm;
+            if(gem->speed.x > 0.0f)
+                gem->speed.x = 0.0f;
+        }
+
+        // Movement
+        gem->pos.x += gem->speed.x *tm;
+        gem->pos.y += gem->speed.y *tm;
+
+        // If outside the screen (horizontal)
+        if(gem->pos.x > 256.0f)
+            gem->pos.x -= 256.0f;
+
+        else if(gem->pos.x < 0.0f)
+            gem->pos.x += 256.0f;
+
+        // Bottom
+        if(gem->pos.y > camY+192+16.0f) {
+
+            gem->exist = false;
+            gem->deathTimer = -1.0f;
+        }
+    }
 
     // Animate
     spr_animate(&gem->spr,0,0,4, 5, tm);
 
     // If outside the screen, "kill"
-    if(gem->pos.y < get_global_camera()->pos.y - 12.0f - AMPLITUDE) {
+    if(gem->pos.y < camY - 12.0f - AMPLITUDE) {
 
         gem->exist = false;
     }
@@ -88,6 +152,16 @@ void gem_draw(GEM* gem) {
 
     // Draw
     spr_draw(&gem->spr,bmpGem, x,y, FLIP_NONE);
+
+    // "Off-screen"
+    if(gem->hasGravity) {
+
+        if(gem->pos.x < 16.0f)
+            spr_draw(&gem->spr,bmpGem, x +256.0f,y, FLIP_NONE);
+
+        else if(gem->pos.x > 256.0f-16.0f)
+            spr_draw(&gem->spr,bmpGem, x - 256.0f,y, FLIP_NONE);
+    }
 }
 
 
@@ -107,5 +181,22 @@ void gem_goat_collision(GEM* gem, GOAT* g) {
 
           // Add gem to status
           status_add_coin();
+    }
+}
+
+
+// Gem-to-floor collision
+void gem_floor_collision(GEM* g, float x, float y, float w) {
+
+    const float WIDTH = 4;
+    const float DELTA = 1.0f;
+
+    if(g->pos.x >= x-WIDTH && g->pos.x < x+w+WIDTH) {
+
+        if(g->speed.y > 0.0f && g->oldY+8.0f < y+DELTA && g->pos.y+8.0f > y-DELTA) {
+
+            g->pos.y = y-8.0f;
+            g->speed.y *= -0.90f;
+        }
     }
 }
