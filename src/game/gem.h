@@ -31,7 +31,7 @@ GEM create_gem(VEC2 pos);
 // Update a gem
 void gem_update(GEM* gem, float tm);
 
-// Draw a game
+// Draw a gem
 void gem_draw(GEM* gem);
 
 // Gem-to-goat collision

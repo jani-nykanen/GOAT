@@ -348,7 +348,7 @@ void goat_draw(GOAT* g) {
 void goat_floor_collision(GOAT* g, float x, float y, float w) {
 
     const float WIDTH = 8;
-    const float DELTA = 0.1f;
+    const float DELTA = 1.0f;
 
     if(g->pos.x >= x-WIDTH && g->pos.x < x+w+WIDTH) {
 

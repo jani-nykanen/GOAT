@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "status.h"
 #include "gem.h"
+#include "monster.h"
 
 #include "../global.h"
 #include "../vpad.h"
@@ -17,17 +18,40 @@
 
 // Constants
 #define GEM_COUNT 16
+#define MONSTER_COUNT 16
 static const float INITIAL_GLOBAL_SPEED = 0.5f;
+static const float SPEED_UP_INTERVAL = 30.0f * 60.f;
+static const float SPEED_UP = 0.1f;
+static const int MAX_UP = 7;
 
 // Bitmaps
 static BITMAP* bmpFont;
 
 // Global speed
 static float globalSpeed;
+static float speedCounter;
+static int upCounter;
 
 // Game objects
 static GOAT player;
 static GEM gems[GEM_COUNT];
+static MONSTER monsters[MONSTER_COUNT];
+
+
+// Update speed
+static void update_speed(float tm) {
+
+    if(upCounter >= MAX_UP) return;
+
+    speedCounter += 1.0f * tm;
+    if(speedCounter >= SPEED_UP_INTERVAL) {
+
+        speedCounter -= SPEED_UP_INTERVAL;
+        globalSpeed += SPEED_UP;
+
+        ++ upCounter;
+    }
+}
 
 
 // Initialize
@@ -43,6 +67,7 @@ static int game_init() {
     init_global_camera();
     init_status(ass);
     init_gems(ass);
+    init_monsters(ass);
 
     // Reset
     game_reset();
@@ -59,13 +84,22 @@ static void game_update(float tm) {
     // Update stage
     stage_update(globalSpeed, tm);
 
-    // Update game objects
+    // Update player
     goat_update(&player, tm);
     stage_goat_collision(&player);
+
+    // Update gems
     for(i = 0; i < GEM_COUNT; ++ i) {
 
         gem_update(&gems[i], tm);
         gem_goat_collision(&gems[i], &player);
+    }
+
+    // Update monsters
+    for(i = 0; i < MONSTER_COUNT; ++ i) {
+
+        monster_update(&monsters[i], tm);
+        monster_goat_collision(&monsters[i], &player);
     }
 
     // Update status
@@ -73,6 +107,9 @@ static void game_update(float tm) {
 
     // Move camera
     move_camera(globalSpeed, tm);
+
+    // Update global speed
+    update_speed(tm);
 }
 
 
@@ -95,6 +132,10 @@ static void game_draw() {
     for(i = 0; i < GEM_COUNT; ++ i) {
 
         gem_draw(&gems[i]);
+    }
+    for(i = 0; i < MONSTER_COUNT; ++ i) {
+
+        monster_draw(&monsters[i]);
     }
     goat_draw(&player);
 
@@ -125,6 +166,8 @@ void game_reset() {
     // Set default values
     globalSpeed = INITIAL_GLOBAL_SPEED;
     get_global_camera()->pos = vec2(0, 0);
+    upCounter = 0;
+    speedCounter = 0;
 
     // (Re)create game objects
     player = create_goat(vec2(128.0f,192.0f - 18.0f));
@@ -132,6 +175,11 @@ void game_reset() {
 
         gems[i].exist = false;
         gems[i].deathTimer = -1.0f;
+    }
+    for(i = 0; i < MONSTER_COUNT; ++ i) {
+
+        monsters[i].exist = false;
+        monsters[i].deathTimer = -1.0f;
     }
 
     // Reset components
@@ -162,4 +210,27 @@ void add_gem(float x, float y) {
             return;
         }
     }
+}
+
+
+// Add a monster to the game world
+void add_monster(float x, float y, float left, float right, int id) {
+
+    // Find the first monster that does not exist
+    int i = 0;
+    for(; i < MONSTER_COUNT; ++ i) {
+
+        if(monsters[i].exist == false && monsters[i].deathTimer <= 0.0f) {
+
+            monsters[i] = create_monster(vec2(x, y), left, right, id);
+            return;
+        }
+    }
+}
+
+
+// Get the amount of speed ups
+int get_speed_up_count() {
+
+    return upCounter;
 }

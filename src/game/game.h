@@ -18,5 +18,11 @@ SCENE game_get_scene();
 // Add a gem to the game world
 void add_gem(float x, float y);
 
+// Add a monster to the game world
+void add_monster(float x, float y, float left, float right, int id);
+
+// Get the amount of speed ups
+int get_speed_up_count();
+
 #endif // __GAME__
 

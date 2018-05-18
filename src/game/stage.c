@@ -56,16 +56,17 @@ static void create_first_platform() {
     }
     p->y = 192 +48 - 64;
     p->exist = true;
+    p->scored = true;
 }
 
 
-// Add objects to a platform
-static void add_objects(float y) {
+// Add gems to a platform
+static void add_gems_to_platform(float y) {
 
     const int MAX_GEM = 4;
 
     int i = 0;
-    float camY = get_global_camera()->pos.y;
+    float camY = floorf(get_global_camera()->pos.y);
 
     // How many
     int count = rand() % MAX_GEM;
@@ -82,12 +83,31 @@ static void add_objects(float y) {
 }
 
 
+// Add a monster to a platform
+static void add_monster_to_platform(int sx, int leftx, int len, int y, bool ground) {
+
+    // TODO: Aerial enemies
+    if(!ground) return;
+
+    int id = rand() % 3;
+    if(id != 0) return;
+
+    int x = sx + rand() % (len-1);
+    float ypos = floorf(get_global_camera()->pos.y) + (float)y;
+    float left = leftx*16.0f;
+    float right = sx*16.0f + len*16.0f;
+
+    add_monster(x*16.0f +8.0f, ypos, left, right, id);
+}
+
+
 // Create a new platform
 static void create_platform() {
 
     const int MAX_HOLE_START = 4;
     const int MAX_HOLE_LENGTH = 5;
     const int MAX_GROUND_LENGTH = 6;
+    const float Y_POS = 192 +48;
 
     const int BRIDGE_PROB = 4;
     const int BIG_PROB = 3;
@@ -120,6 +140,7 @@ static void create_platform() {
     int bridgeBuilt =0;
     int decorationPos = 0;
     bool created = false;
+    int notHoleStart = 0;
 
     for(i = 0; i < TILE_COUNT; ++ i) {
         
@@ -131,8 +152,14 @@ static void create_platform() {
             // Calculate hole/platform size
             if(isHole)
                 count = rand() % MAX_HOLE_LENGTH + 2;
-            else
+            
+            else {
+
+                if(bridgeBuilt != 1)
+                    notHoleStart = i;
+                
                 count = rand() % MAX_GROUND_LENGTH + 1;
+            }
             
             // If bridge ending, set bridge state to 2 
             // so bridges are built no longer
@@ -147,6 +174,10 @@ static void create_platform() {
                     bridgeBuilt = 1;
                 }
             }
+
+            // Add monsters
+            if(i < TILE_COUNT-2 && count >= 2)
+                add_monster_to_platform(i, notHoleStart, count, Y_POS, !isHole || bridgeBuilt == 1);
 
             // Add decorations
             if(!isHole) {
@@ -200,12 +231,11 @@ static void create_platform() {
         else
             platforms[p].tiles[i] = 2;
     }
-    float y = 192 +48;
-    platforms[p].y = y;
+    platforms[p].y = Y_POS;
     platforms[p].exist = true;
 
-    // Add objects
-    add_objects(y);
+    // Add gems
+    add_gems_to_platform(Y_POS);
 
 }
 
@@ -281,7 +311,6 @@ static void draw_platform(PLATFORM* p) {
     int y = (int)floorf(p->y);
     bool left, right;
     int tile =0;
-
 
     // Draw bridge
     for(; i < TILE_COUNT; ++ i) {

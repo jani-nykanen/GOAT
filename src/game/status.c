@@ -93,10 +93,8 @@ void status_draw() {
     const int HEART_DELTA = 22;
     const int SCORE_TEXT_Y = 0;
     const int SCORE_Y = 4;
-    const int COIN_TEXT_X = 256-60;
     const int COIN_TEXT_Y = -4;
-    const int COIN_X = COIN_TEXT_X - 16;
-    const int COINT_Y = 0;
+    const int COIN_Y = 0;
 
     int i = 0;
     int sx = 0;
@@ -117,9 +115,19 @@ void status_draw() {
     draw_text(bmpFontBig, str, 128, SCORE_Y, -16, 0, true);
 
     // Draw coins
+    int coinX;
+    if(coins < 10)
+        coinX = 256-48;
+
+    else if(coins < 100)
+        coinX = 256-60;
+
+    else
+        coinX = 256-72;
+
     snprintf(str, 16, "~%d", coins);
-    draw_text(bmpFontBig, str, COIN_TEXT_X, COIN_TEXT_Y, -16, 0, false);
-    draw_bitmap_region(bmpHUD,48,0,24,24, COIN_X, COINT_Y, 0);
+    draw_text(bmpFontBig, str, coinX, COIN_TEXT_Y, -16, 0, false);
+    draw_bitmap_region(bmpHUD,48,0,24,24, coinX -16, COIN_Y, 0);
 
 }
 
