@@ -410,3 +410,10 @@ void goat_hurt_collision(GOAT* g, float x, float y, float w, float h) {
         status_reduce_health();
     }
 }
+
+
+// Stop dashing
+void goat_stop_dashing(GOAT* g) {
+
+    g->dashTimer = DASH_TIMER_MAX;
+}

@@ -63,4 +63,7 @@ void goat_floor_collision(GOAT* g, float x, float y, float w);
 // Hurt collision
 void goat_hurt_collision(GOAT* g, float x, float y, float w, float h);
 
+// Stop dashing
+void goat_stop_dashing(GOAT* g);
+
 #endif // __GOAT__

@@ -220,7 +220,7 @@ void add_monster(float x, float y, float left, float right, int id) {
     int i = 0;
     for(; i < MONSTER_COUNT; ++ i) {
 
-        if(monsters[i].exist == false && monsters[i].deathTimer <= 0.0f) {
+        if(monsters[i].exist == false && monsters[i].dying == false) {
 
             monsters[i] = create_monster(vec2(x, y), left, right, id);
             return;

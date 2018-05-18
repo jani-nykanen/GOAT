@@ -22,11 +22,15 @@ typedef struct {
     int direction;
     SPRITE spr;
 
+    SPRITE splash;
+    VEC2 splashPos;
+
     float leftLimit;
     float rightLimit;
 
     bool exist;
     bool stomped;
+    bool dying;
     float deathTimer;
 }
 MONSTER;

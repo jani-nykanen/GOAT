@@ -11,11 +11,13 @@
 // Constants
 static const float DEATH_MAX = 20.0f;
 static const float WALKER_SPEED = 0.5f;
-static const float DEATH_GRAVITY = 0.25f;
-static const float DEATH_SPEED_Y = -3.0f;
+static const float DEATH_GRAVITY = 0.1f;
+static const float DEATH_SPEED_Y = -1.5f;
+static const float DEATH_SPEED_X_MUL = 1.25f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
+static BITMAP* bmpSplash;
 
 
 // "Set monster"
@@ -88,11 +90,22 @@ static void draw_fading(int sx, int sy, int x, int y, int fade, int flip) {
 }
 
 
+// Splash!
+static void do_splash(MONSTER* m, float x, float y) {
+
+    m->splashPos = vec2(x, y);
+
+    m->splash.count = 0;
+    m->splash.frame = 0;
+}
+
+
 // Initialize monsters
 void init_monsters(ASSET_PACK* ass) {
 
     // Get assets
     bmpMonsters = (BITMAP*)assets_get(ass, "monsters");
+    bmpSplash = (BITMAP*)assets_get(ass, "splash");
 }
 
 
@@ -105,7 +118,9 @@ MONSTER create_monster(VEC2 pos, float left, float right, int id) {
     m.deathTimer = 0.0f;
     m.speed = vec2(0, 0);
     m.spr = create_sprite(32, 32);
+    m.splash = create_sprite(32, 32);
     m.exist = true;
+    m.dying = false;
     m.flip = FLIP_NONE;
     m.leftLimit = left;
     m.rightLimit = right;
@@ -124,16 +139,28 @@ void monster_update(MONSTER* m, float tm) {
 
     if(m->exist == false) {
 
+        if(!m->dying) return;
+
         // Update death timer
         if(m->deathTimer > 0.0f) {
 
             m->deathTimer -= 1.0f * tm;
+
             m->pos.x += m->deathSpeed.x *tm;
             m->pos.y += m->deathSpeed.y *tm;
 
             if(!m->stomped)
                 m->deathSpeed.y += DEATH_GRAVITY * tm;
         }
+
+        // Animate splash
+        if(m->splash.frame < 5)
+            spr_animate(&m->splash, 0,0,5,5, tm);
+
+        // If splash ended & death timer <= 0, no more dying
+        if(m->splash.frame >= 5 && m->deathTimer <= 0.0f)
+            m->dying = false;
+
         return;
     }
 
@@ -152,29 +179,30 @@ void monster_draw(MONSTER* m) {
     int x = (int)floorf(m->pos.x-16.0f);
     int y = (int)floorf(m->pos.y-28.0f) +1;
 
+    // Splash position
+    int sx = (int)floorf(m->splashPos.x-16.0f);
+    int sy = (int)floorf(m->splashPos.y-16.0f);
+
     if(!m->exist) {
+        
+        if(!m->dying) return;
 
         // Fading
         if(m->deathTimer > 0.0f) {
 
             int fade = 1+ (int)roundf(m->deathTimer / DEATH_MAX * 8.0f);
-
             draw_fading(0, m->id,x,y,fade, m->flip);
-            if(m->pos.x < 0.0f)
-                draw_fading(0, m->id,x+256,y,fade, m->flip);
 
-            else if(m->pos.x > 256.0f)
-                draw_fading(0, m->id,x-256,y,fade, m->flip);  
         }   
+
+        // Splash
+        spr_draw(&m->splash, bmpSplash, sx, sy, FLIP_NONE);
+
         return;
     }
 
     // Draw
     spr_draw(&m->spr,bmpMonsters, x,y, m->flip);
-
-    // Limits
-    // fill_rect((int)m->leftLimit, y,2,16, 0b11100000);
-    // fill_rect((int)m->rightLimit, y,2,16, 0b11100000);
 }
 
 
@@ -194,9 +222,12 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
             m->exist = false;
             m->deathTimer = DEATH_MAX;
             m->deathSpeed = vec2(0, 0);
+            m->dying = true;
             m->stomped = true;
 
             g->speed.y = GOAT_JUMP_BACK;
+
+            do_splash(m, g->pos.x, m->pos.y-18);
 
             return;
         }
@@ -217,10 +248,16 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
 
                 m->exist = false;
                 m->deathTimer = DEATH_MAX;
+                m->dying = true;
                 m->stomped = false;
 
-                m->deathSpeed.x = g->speed.x * 2.0f;
+                m->deathSpeed.x = g->speed.x * DEATH_SPEED_X_MUL;
                 m->deathSpeed.y = DEATH_SPEED_Y;
+
+                g->speed.x = 0.0f;
+                goat_stop_dashing(g);
+                
+                do_splash(m,m->pos.x, g->pos.y -10.0f);
 
                 return;
             }
