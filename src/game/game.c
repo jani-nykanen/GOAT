@@ -124,13 +124,24 @@ static void game_update(float tm) {
 // Draw
 static void game_draw() {
 
+    const int SHAKE_COUNT = 7;
+
+    int shakeX = 0;
+    int shakeY = 0;
     int i = 0;
 
+    // If player hurt, shake the screen
+    if(player.hurtTimer > 0.0f) {
+
+        shakeX = rand() % SHAKE_COUNT - (SHAKE_COUNT/2);
+        shakeY = rand() % SHAKE_COUNT - (SHAKE_COUNT/2);
+    }
+
     // Reset translation
-    translate(0, 0);
+    translate(shakeX, shakeY);
 
     // Clear screen
-    clear(0b10110111);
+    clear(0b01000000);
 
     // Draw stage
     stage_draw();

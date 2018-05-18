@@ -14,8 +14,12 @@
 typedef struct {
 
     VEC2 pos;
+    VEC2 startPos;
     VEC2 speed;
     VEC2 deathSpeed;
+    VEC2 target;
+
+    float waveTimer;
     
     int id;
     int flip;

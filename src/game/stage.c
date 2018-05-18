@@ -86,14 +86,25 @@ static void add_gems_to_platform(float y) {
 // Add a monster to a platform
 static void add_monster_to_platform(int sx, int leftx, int len, int y, bool ground) {
 
-    // TODO: Aerial enemies
-    if(!ground) return;
+    // Monster probability
+    int monsterProb = 3;
+    if(rand() % monsterProb != 0) return;
 
-    int id = rand() % 3;
-    if(id != 0) return;
+    bool groundType[] = {true, false};
+    float yPositions[] = {0.0f, -14.0f};
+
+    // Get random monster ID
+    int id = rand() % 2;
+
+    // If the enemy type is not suitable, get another one
+    if(groundType[id] != ground) {
+
+        // TODO: Other ids?
+        id = ground ? 0 : 1;
+    }
 
     int x = sx + rand() % (len-1);
-    float ypos = floorf(get_global_camera()->pos.y) + (float)y;
+    float ypos = floorf(get_global_camera()->pos.y) + (float)y + yPositions[id];
     float left = leftx*16.0f;
     float right = sx*16.0f + len*16.0f;
 

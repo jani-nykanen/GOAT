@@ -12,11 +12,15 @@
 // Constants
 static const float DEATH_MAX = 20.0f;
 static const float WALKER_SPEED = 0.5f;
+static const float FLIER_SPEED = 0.75f;
+static const float FLIER_ACC = 0.05f;
 static const float DEATH_GRAVITY = 0.1f;
 static const float DEATH_SPEED_Y = -1.5f;
 static const float DEATH_SPEED_X_MUL = 1.25f;
 static const float GEM_SPEED_X_MUL = 1.0f;
 static const float GEM_SPEED_Y = -1.25f;
+static const float FLIER_AMPLITUDE = 8.0f;
+static const float FLIER_WAVE_SPEED = 0.05f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
@@ -29,15 +33,78 @@ static void set_monster(MONSTER* m) {
     switch(m->id) {
 
     case 0:
+
         m->direction = rand() % 2 == 0 ? 1 : -1;
         m->speed.x = WALKER_SPEED * m->direction;
-        
+        break;
+
+    case 1:
+
+        m->waveTimer = (float) (rand() % 1000) / 1000.0f * M_PI * 2;
+        m->direction = rand() % 2 == 0 ? 1 : -1;
+        m->target.x = FLIER_SPEED * m->direction;
         break;
 
     default:
         break;
     }
 
+}
+
+
+// Unique movement
+static void unique_movement(MONSTER* m, float tm) {
+
+    switch(m->id) {
+
+    case 0:
+
+        // Limit collisions
+        if(m->speed.x < 0.0f && m->pos.x-8.0f < m->leftLimit) {
+
+            m->speed.x *= -1;
+            m->pos.x = m->leftLimit +8.0f;
+        }
+        else if(m->speed.x > 0.0f && m->pos.x+8.0f > m->rightLimit) {
+
+            m->speed.x *= -1;
+            m->pos.x = m->rightLimit -8.0f;
+        }
+        break;
+
+    case 1:
+
+        // Update speed
+        if(m->target.x > m->speed.x) {
+
+            m->speed.x += FLIER_ACC * tm;
+            if(m->speed.x > m->target.x)
+                m->speed.x = m->target.x;
+        }
+        else if(m->target.x < m->speed.x) {
+
+            m->speed.x -= FLIER_ACC * tm;
+            if(m->speed.x < m->target.x)
+                m->speed.x = m->target.x;
+        }
+
+        // Limit collisions
+        if( (m->target.x < 0.0f && m->pos.x-8.0f < m->leftLimit)
+        || (m->target.x > 0.0f && m->pos.x+8.0f > m->rightLimit) ) {
+
+            m->target.x *= -1;
+        }
+
+        // "Waves"
+        m->waveTimer += FLIER_WAVE_SPEED * tm;
+        m->pos.y = m->startPos.y + sinf(m->waveTimer) * FLIER_AMPLITUDE;
+
+        break;
+
+    default:
+
+        break;
+    }
 }
 
 
@@ -48,17 +115,8 @@ static void move_monster(MONSTER* m, float tm) {
     m->pos.x += m->speed.x * tm;
     m->pos.y += m->speed.y * tm;
 
-    // Limit collisions
-    if(m->speed.x < 0.0f && m->pos.x-8.0f < m->leftLimit) {
-
-        m->speed.x *= -1;
-        m->pos.x = m->leftLimit +8.0f;
-    }
-    else if(m->speed.x > 0.0f && m->pos.x+8.0f > m->rightLimit) {
-
-        m->speed.x *= -1;
-        m->pos.x = m->rightLimit -8.0f;
-    }
+    // Unique movement
+    unique_movement(m, tm);
 
     // If "too high", die
     if(m->pos.y+1 < get_global_camera()->pos.y) {
@@ -77,6 +135,12 @@ static void animate_monster(MONSTER* m, float tm) {
     case 0:
         spr_animate(&m->spr, m->id,0,3, 6, tm);
         m->flip = m->speed.x > 0.0f ? FLIP_H : FLIP_NONE;
+        break;
+
+    case 1:
+
+        spr_animate(&m->spr, m->id,0,3, 5, tm);
+        m->flip = FLIP_NONE;
         break;
 
     default:
@@ -137,6 +201,7 @@ MONSTER create_monster(VEC2 pos, float left, float right, int id) {
     m.flip = FLIP_NONE;
     m.leftLimit = left;
     m.rightLimit = right;
+    m.startPos = pos;
     if(m.rightLimit > 256)
         m.rightLimit = 256;
 
@@ -168,7 +233,7 @@ void monster_update(MONSTER* m, float tm) {
 
         // Animate splash
         if(m->splash.frame < 5)
-            spr_animate(&m->splash, 0,0,5,5, tm);
+            spr_animate(&m->splash, 0,0,5,4, tm);
 
         // If splash ended & death timer <= 0, no more dying
         if(m->splash.frame >= 5 && m->deathTimer <= 0.0f)
@@ -204,7 +269,7 @@ void monster_draw(MONSTER* m) {
         if(m->deathTimer > 0.0f) {
 
             int fade = 1+ (int)roundf(m->deathTimer / DEATH_MAX * 8.0f);
-            draw_fading(0, m->id,x,y,fade, m->flip);
+            draw_fading(0, m->id*32.0f,x,y,fade, m->flip);
 
         }   
 
