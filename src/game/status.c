@@ -15,7 +15,7 @@ static int SCORE_BASE = 10;
 // Status variables
 static int health;
 static float healthFadeTimer;
-static bool healthFade;
+static int healthFade;
 static unsigned int score;
 static int coins;
 
@@ -66,7 +66,7 @@ void reset_status() {
 
     health = HEALTH_MAX;
     healthFadeTimer = 0.0f;
-    healthFade = false;
+    healthFade = 0;
     score = 0;
     coins = 0;
 }
@@ -76,11 +76,11 @@ void reset_status() {
 void status_update(float tm) {
 
     // Update fading health
-    if(healthFade) {
+    if(healthFade != 0) {
 
         healthFadeTimer -= 1.0f * tm;
         if(healthFadeTimer <= 0.0f)
-            healthFade = false;
+            healthFade = 0;
     }
 }
 
@@ -95,28 +95,39 @@ void status_draw() {
     const int SCORE_Y = 4;
     const int COIN_TEXT_Y = -4;
     const int COIN_Y = 0;
+    const int FADE_COUNT = 8;
 
     int i = 0;
     int sx = 0;
     char str[16];
 
+    int hmax = healthFade == 2 ? health-2 : health-1;
+
     // Draw hearts
     for(; i < HEALTH_MAX; ++ i) {
 
-        sx = health-1 >= i ? 24 : 0;
+        sx = hmax >= i ? 24 : 0;
 
         draw_bitmap_region(bmpHUD, sx,0,24,24, 
             HEART_X + HEART_DELTA*i, HEART_Y, 0 );
     }
 
     // Draw a fading heart
-    if(healthFade) {
+    if(healthFade != 0) {
 
-        int fade = 1 + (int)floorf(healthFadeTimer / HEALTH_FADE_MAX * 8.0f);
+        int fade = 0;
+        if(healthFade == 1)
+            fade = 1 + (int)floorf(healthFadeTimer / HEALTH_FADE_MAX * FADE_COUNT);
+
+        else
+            fade = 1 + FADE_COUNT - (int)floorf(healthFadeTimer / HEALTH_FADE_MAX * FADE_COUNT);
+
         sx = 24;
 
+        int hpos = healthFade == 1 ? health : health-1;
+
         draw_bitmap_region_fading(bmpHUD, sx,0,24,24, 
-            HEART_X + HEART_DELTA*(health), HEART_Y, 0, fade, get_alpha() );
+            HEART_X + HEART_DELTA*(hpos), HEART_Y, 0, fade, get_alpha() );
     }
 
     // Draw score
@@ -147,7 +158,18 @@ void status_reduce_health() {
 
     -- health;
     healthFadeTimer = HEALTH_FADE_MAX;
-    healthFade = true;
+    healthFade = 1;
+}
+
+
+// Add health
+void status_add_health() {
+
+    if(health == HEALTH_MAX) return;
+
+    health ++;
+    healthFadeTimer = HEALTH_FADE_MAX;
+    healthFade = 2;
 }
 
 

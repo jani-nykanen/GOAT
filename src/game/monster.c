@@ -62,7 +62,7 @@ static void set_monster(MONSTER* m) {
         break;
 
     case 3:
-        m->spcTimer = 0.0f;
+        m->spcTimer = (float) (rand() % 1000) / 1000.0f * M_PI * 2;
         break;
 
     case 4:
@@ -210,24 +210,19 @@ static void unique_movement(MONSTER* m, float tm) {
             m->speed.x += m->target.x * tm;
             if(m->speed.x > FISH_TARGET)
                 m->speed.x = FISH_TARGET;
-
-            if(m->pos.x > 256.0f + 32.0f) {
-
-                m->exist = false;
-                m->dying = false;
-            }
         }
         else if(m->target.x < 0.0f && m->speed.x > -FISH_TARGET) {
 
             m->speed.x += m->target.x * tm;
             if(m->speed.x < -FISH_TARGET)
                 m->speed.x = -FISH_TARGET;
+        }
 
-            if(m->pos.x < 0.0f) {
+        // Outside the screen (horizontally)
+        if(m->pos.x > 256.0f + 32.0f || m->pos.x < -32.0f) {
 
-                m->exist = false;
-                m->dying = false;
-            }
+            m->exist = false;
+            m->dying = false;
         }
 
         break;

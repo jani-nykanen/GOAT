@@ -419,8 +419,8 @@ void goat_hurt_collision(GOAT* g, float x, float y, float w, float h) {
 
     // Check if inside the actual goat or those "off-screen entities"
     if(hurt(g->pos,DIM_X,DIM_Y,x,y,w,h)
-    || hurt(vec2(g->pos.x + 256, g->pos.y),DIM_X,DIM_Y,x,y,w,h)
-    || hurt(vec2(g->pos.x - 256, g->pos.y),DIM_X,DIM_Y,x,y,w,h) ) {
+    ||(g->pos.x < g->spr.w/2 && hurt(vec2(g->pos.x + 256, g->pos.y),DIM_X,DIM_Y,x,y,w,h) )
+    ||(g->pos.x > 256.0f-g->spr.w/2 && hurt(vec2(g->pos.x - 256, g->pos.y),DIM_X,DIM_Y,x,y,w,h) ) ) {
 
         g->hurtTimer = HURT_TIME;
         status_reduce_health();

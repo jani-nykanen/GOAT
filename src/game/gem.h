@@ -18,6 +18,7 @@ typedef struct {
     SPRITE spr;
     bool exist;
     bool hasGravity;
+    bool isHeart;
 
     float waveTimer;
     float deathTimer;

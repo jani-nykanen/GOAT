@@ -37,6 +37,9 @@ static GOAT player;
 static GEM gems[GEM_COUNT];
 static MONSTER monsters[MONSTER_COUNT];
 
+// Is paused
+static bool paused;
+
 
 // Update speed
 static void update_speed(float tm) {
@@ -69,6 +72,9 @@ static int game_init() {
     init_gems(ass);
     init_monsters(ass);
 
+    // Set default values
+    paused = false;
+
     // Reset
     game_reset();
 
@@ -81,6 +87,12 @@ static void game_update(float tm) {
 
     int i = 0;
     int i2 = 0;
+
+    // Check pause
+    if(vpad_get_button(2) == STATE_PRESSED)
+        paused = !paused;
+
+    if(paused) return;
 
     // Update stage
     stage_update(globalSpeed, tm);

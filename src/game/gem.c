@@ -17,9 +17,13 @@ static const float GEM_GRAVITY = 0.1f;
 static const float MAX_GRAVITY = 2.5f;
 static const float GEM_SLOW_X = 0.025f;
 static const float WAIT_TIME = 20.0f;
+static const int HEART_PROB_MAX = 16;
 
 // Bitmaps
 static BITMAP* bmpGem;
+
+// Heart probability
+static int heartProb;
 
 
 // Initialize gems
@@ -27,12 +31,15 @@ void init_gems(ASSET_PACK* ass) {
 
     // Get bitmaps
     bmpGem = (BITMAP*)assets_get(ass, "gem");
+
+    // Set heart probability to max
+    heartProb = HEART_PROB_MAX;
 }
 
 
-// Create a gem
-GEM create_gem(VEC2 pos) {
-    
+// Create gem, base
+static GEM create_gem_base(VEC2 pos) {
+
     GEM g;
     g.pos = pos;
     g.spr = create_sprite(24, 24);
@@ -46,15 +53,32 @@ GEM create_gem(VEC2 pos) {
 }
 
 
+// Create a gem
+GEM create_gem(VEC2 pos) {
+    
+    GEM g = create_gem_base(pos);
+
+    if(heartProb > 2)
+        -- heartProb;
+    g.isHeart = (rand() % heartProb == 0);
+    
+    if(g.isHeart)
+        heartProb = HEART_PROB_MAX;
+
+    return g;
+}
+
+
 // Create a gem with gravity
 GEM create_gem_with_gravity(VEC2 pos, VEC2 speed) {
 
-    GEM g = create_gem(pos);
+    GEM g = create_gem_base(pos);
     g.hasGravity = true;
     g.speed = speed;
     g.waveTimer = 0.0f;
     g.oldY = 0.0f;
     g.waitTimer = WAIT_TIME;
+    g.isHeart = false;
 
     return g;
 }
@@ -129,7 +153,11 @@ void gem_update(GEM* gem, float tm) {
     }
 
     // Animate
-    spr_animate(&gem->spr,0,0,4, 5, tm);
+    if(gem->isHeart)
+        spr_animate(&gem->spr,1,0,5, 5, tm);
+    
+    else
+        spr_animate(&gem->spr,0,0,4, 5, tm);
 
     // If outside the screen, "kill"
     if(gem->pos.y < camY - 12.0f - AMPLITUDE) {
@@ -152,7 +180,7 @@ void gem_draw(GEM* gem) {
         if(gem->deathTimer > 0.0f) {
 
             int fade = 1+ (int)round(gem->deathTimer / DEATH_MAX * 8.0f);
-            draw_bitmap_region_fading(bmpGem,0,0,24,24,x,y, FLIP_NONE, fade, get_alpha());
+            draw_bitmap_region_fading(bmpGem,0,gem->isHeart ? 24 : 0,24,24,x,y, FLIP_NONE, fade, get_alpha());
         }   
         return;
     }
@@ -187,7 +215,7 @@ void gem_goat_collision(GEM* gem, GOAT* g) {
           gem->deathTimer = DEATH_MAX;
 
           // Add gem to status
-          status_add_coin();
+          (gem->isHeart ? status_add_health : status_add_coin) ();
     }
 }
 

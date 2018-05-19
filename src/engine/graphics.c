@@ -184,7 +184,6 @@ static bool clip(BITMAP* bmp, int* dx, int* dy, int* sx, int* sy, int* sw, int* 
         if((flip & FLIP_H) != 0) {
 
             *sx += ow - *sw;
-
         }
     }
     else if(*dx < 0) {
@@ -193,11 +192,10 @@ static bool clip(BITMAP* bmp, int* dx, int* dy, int* sx, int* sy, int* sw, int* 
         *sx += -*dx;
         *sw += *dx;
         *dx = 0;
-
+        
         if((flip & FLIP_H) != 0) {
 
             *sx += *sw -ow;
-
         }
     }
     if(*dy + *sh >= gframe->height) {

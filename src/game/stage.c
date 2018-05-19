@@ -10,6 +10,7 @@
 
 #include "../include/renderer.h"
 #include "../include/std.h"
+#include "../include/utility.h"
 
 // Constants
 #define PLATFORM_COUNT 5
@@ -86,17 +87,37 @@ static void add_gems_to_platform(float y) {
 // Add a monster to a platform
 static void add_monster_to_platform(int sx, int leftx, int len, int y, bool ground) {
 
-    const int MAX_ID = 5;
+    int maxID = 2;
+    int monsterProb = 4;
+    int upCount = get_speed_up_count();
 
-    // Monster probability
-    int monsterProb = 3;
+    if(upCount >= 1) {
+
+        ++ maxID;
+        -- monsterProb;
+    }
+
+    if(upCount >= 2) {
+
+        ++ maxID;
+        -- monsterProb;
+    }
+    if(upCount >= 3)
+        ++ maxID;
+
+    if(upCount >= 5)
+        -- monsterProb;
+
+    if(upCount >= 7)
+        -- monsterProb;
+
     if(rand() % monsterProb != 0) return;
 
     bool groundType[] = {true, false, true, false, true};
     float yPositions[] = {0.0f, -14.0f, 0.0f, -14.0f, 0.0f};
 
     // Get random monster ID
-    int id = rand() % MAX_ID;
+    int id = rand() % maxID;
 
     // If the enemy type is not suitable, get another one
     if(groundType[id] != ground) {
@@ -104,7 +125,7 @@ static void add_monster_to_platform(int sx, int leftx, int len, int y, bool grou
         while(true) {
 
             ++ id;
-            id %= MAX_ID;
+            id %= maxID;
             if(groundType[id] == ground)
                 break;
         }
@@ -122,8 +143,11 @@ static void add_monster_to_platform(int sx, int leftx, int len, int y, bool grou
 // Add a fish
 static void add_fish_to_platform(int y) {
 
-    int fishProb = 3;
+    int upCount = get_speed_up_count();
+    if(upCount < 2) return;
 
+    int fishProb =  max_2(2, 8 - upCount);
+    
     if(rand() % fishProb != 0) return;
 
     int dir = rand() % 2 == 0 ? 1 : -1;

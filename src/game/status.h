@@ -22,6 +22,9 @@ void status_draw();
 // Reduce health
 void status_reduce_health();
 
+// Add health
+void status_add_health();
+
 // Add a coin
 void status_add_coin();
 
