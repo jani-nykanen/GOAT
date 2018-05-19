@@ -241,6 +241,12 @@ static void animate_monster(MONSTER* m, float tm) {
         }
         break;
 
+    case 4:
+        spr_animate(&m->spr, m->id,0,3, 8, tm);
+        m->flip = FLIP_NONE;
+        break;
+
+
     default:
         break;
     }
@@ -398,25 +404,6 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
         goat_hurt_collision(g,m->pos.x-19,m->pos.y-16,28,16);
     }
 
-    // If in the same horizontal area
-    if(g->pos.x+8.0f >= m->pos.x-8.0f && g->pos.x-8.0f <= m->pos.x+8.0f) {
-
-        // If the goat is jumping over the monster
-        if(g->speed.y > 0.0f && g->pos.y > m->pos.y-26.0f && g->pos.y < m->pos.y-16.0f) {
-
-            monster_die(m, true);
-            m->deathSpeed = vec2(0, 0);
-
-            g->speed.y = GOAT_JUMP_BACK;
-
-            do_splash(m, g->pos.x, m->pos.y-18);
-            add_gem_with_gravity(m->pos.x,m->pos.y-12.0f,0.0f,-0.5f);
-
-            return;
-        }
-
-    }
-
     // Ram collision
     if(g->dashing) {
 
@@ -446,6 +433,32 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
             }
 
         }
+    }
+
+    // If hedgehog (id 4)
+    if(m->id == 4) {
+
+        goat_hurt_collision(g,m->pos.x-11,m->pos.y-26,22,12);
+    }
+
+
+    // If in the same horizontal area
+    if(g->pos.x+8.0f >= m->pos.x-8.0f && g->pos.x-8.0f <= m->pos.x+8.0f) {
+
+        // If the goat is jumping over the monster
+        if(g->speed.y > 0.0f && g->pos.y > m->pos.y-26.0f && g->pos.y < m->pos.y-16.0f) {
+
+            monster_die(m, true);
+            m->deathSpeed = vec2(0, 0);
+
+            g->speed.y = GOAT_JUMP_BACK;
+
+            do_splash(m, g->pos.x, m->pos.y-18);
+            add_gem_with_gravity(m->pos.x,m->pos.y-12.0f,0.0f,-0.5f);
+
+            return;
+        }
+
     }
 
     // Hurt collision
