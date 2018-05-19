@@ -29,6 +29,8 @@ static const float SLIME_GRAVITY_MAX = 2.5f;
 static const float SLIME_JUMP_MIN = -1.5f;
 static const float SLIME_JUMP_MAX = -2.5f;
 static const float SLIME_SPEED_X = 0.625f;
+static const float SPIKEY_AMPLITUDE = 16.0f;
+static const float SPIKEY_WAVE_SPEED = 0.025f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
@@ -55,6 +57,10 @@ static void set_monster(MONSTER* m) {
 
     case 2:
         m->canJump = true;
+        break;
+
+    case 3:
+        m->spcTimer = 0.0f;
         break;
 
     default:
@@ -170,6 +176,14 @@ static void unique_movement(MONSTER* m, float tm) {
 
         break;
 
+    // Spikey
+    case 3:
+
+        m->spcTimer += SPIKEY_WAVE_SPEED * tm;
+        m->pos.y = m->startPos.y + sinf(m->spcTimer) * SPIKEY_AMPLITUDE;
+
+        break;
+
     default:
 
         break;
@@ -206,6 +220,7 @@ static void animate_monster(MONSTER* m, float tm) {
         m->flip = m->speed.x > 0.0f ? FLIP_H : FLIP_NONE;
         break;
 
+    case 3:
     case 1:
 
         spr_animate(&m->spr, m->id,0,3, 5, tm);
@@ -224,8 +239,6 @@ static void animate_monster(MONSTER* m, float tm) {
             m->spr.frame = m->speed.y < 0.0f ? 1 : 2;
             m->flip = m->speed.x > 0.0f ? FLIP_H : FLIP_NONE;
         }
-        
-        
         break;
 
     default:
@@ -357,7 +370,7 @@ void monster_draw(MONSTER* m) {
         if(m->deathTimer > 0.0f) {
 
             int fade = 1+ (int)roundf(m->deathTimer / DEATH_MAX * 8.0f);
-            draw_fading(0, m->id*32.0f,x,y,fade, m->flip);
+            draw_fading(m->spr.frame*32.0f , m->id*32.0f,x,y,fade, m->flip);
 
         }   
 
@@ -378,6 +391,12 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
     const float GOAT_JUMP_BACK = -2.0f;
 
     if(!m->exist) return;
+
+    // If "spikey" (id 3)
+    if(m->id == 3) {
+
+        goat_hurt_collision(g,m->pos.x-19,m->pos.y-16,28,16);
+    }
 
     // If in the same horizontal area
     if(g->pos.x+8.0f >= m->pos.x-8.0f && g->pos.x-8.0f <= m->pos.x+8.0f) {
