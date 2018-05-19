@@ -21,6 +21,7 @@ typedef struct {
 
     float waveTimer;
     float deathTimer;
+    float waitTimer;
     float oldY;
 }
 GEM;

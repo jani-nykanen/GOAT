@@ -6,6 +6,7 @@
 
 #include "camera.h"
 #include "game.h"
+#include "status.h"
 
 #include "../include/std.h"
 
@@ -174,6 +175,9 @@ static void monster_die(MONSTER* m, bool stomped) {
     m->deathTimer = DEATH_MAX;
     m->dying = true;
     m->stomped = stomped;
+
+    // Add score
+    status_add_score();
 }
 
 
@@ -356,11 +360,18 @@ void monster_to_monster_collision(MONSTER* m1, MONSTER* m2) {
     if(m1->pos.y > m2->pos.y-24 && m1->pos.y-24 < m2->pos.y) {
 
         // Right-to-left
+        // TODO: Get rid of the repeating code
         if(m1->pos.x > m2->pos.x && m1->speed.x < 0.0f && m1->pos.x < m2->pos.x+16.0f) {
 
             m1->speed.x *= -1;
             if(m2->speed.x > 0.0f)
                 m2->speed.x *= -1;
+
+            if(m1->target.x > 0.0f)
+                m1->target.x *= -1;
+
+            if(m2->target.x > 0.0f)
+                m2->target.x *= -1;
         }
         // Left-to-right
         else 
@@ -369,6 +380,12 @@ void monster_to_monster_collision(MONSTER* m1, MONSTER* m2) {
             m1->speed.x *= -1;
             if(m2->speed.x < 0.0f)
                 m2->speed.x *= -1;
+
+            if(m1->target.x < 0.0f)
+                m1->target.x *= -1;
+
+            if(m2->target.x < 0.0f)
+                m2->target.x *= -1;
         }
     }
 }

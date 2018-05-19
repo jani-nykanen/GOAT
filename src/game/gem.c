@@ -16,6 +16,7 @@ static const float DEATH_MAX = 30.0f;
 static const float GEM_GRAVITY = 0.1f;
 static const float MAX_GRAVITY = 2.5f;
 static const float GEM_SLOW_X = 0.025f;
+static const float WAIT_TIME = 20.0f;
 
 // Bitmaps
 static BITMAP* bmpGem;
@@ -39,6 +40,7 @@ GEM create_gem(VEC2 pos) {
     g.deathTimer = 0.0f;
     g.exist = true;
     g.hasGravity = false;
+    g.waitTimer = -1.0f;
 
     return g;
 }
@@ -52,6 +54,7 @@ GEM create_gem_with_gravity(VEC2 pos, VEC2 speed) {
     g.speed = speed;
     g.waveTimer = 0.0f;
     g.oldY = 0.0f;
+    g.waitTimer = WAIT_TIME;
 
     return g;
 }
@@ -70,6 +73,10 @@ void gem_update(GEM* gem, float tm) {
 
         return;   
     }
+
+    // Update wait timer
+    if(gem->waitTimer > 0.0f)
+        gem->waitTimer -= 1.0f * tm;
 
     // Store old y coordinate
     gem->oldY = gem->pos.y;
@@ -170,7 +177,7 @@ void gem_goat_collision(GEM* gem, GOAT* g) {
 
     const float DIM = 10.0f;
 
-    if(!gem->exist) return;
+    if(!gem->exist || gem->waitTimer > 0.0f) return;
     
     // If collision boxes overlay
     if(g->pos.x+8 >= gem->pos.x-DIM && g->pos.x-8 <= gem->pos.x+DIM
