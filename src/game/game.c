@@ -20,7 +20,7 @@
 #define GEM_COUNT 16
 #define MONSTER_COUNT 16
 static const float INITIAL_GLOBAL_SPEED = 0.5f;
-static const float SPEED_UP_INTERVAL = 30.0f * 60.f;
+static const float SPEED_UP_INTERVAL = 20.0f * 60.f;
 static const float SPEED_UP = 0.1f;
 static const int MAX_UP = 10;
 

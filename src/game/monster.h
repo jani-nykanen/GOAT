@@ -20,7 +20,7 @@ typedef struct {
     VEC2 target;
 
     float spcTimer;
-    bool canJump;
+    bool spcSwitch;
     
     int id;
     int flip;

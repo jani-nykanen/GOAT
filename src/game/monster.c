@@ -31,6 +31,8 @@ static const float SLIME_JUMP_MAX = -2.5f;
 static const float SLIME_SPEED_X = 0.625f;
 static const float SPIKEY_AMPLITUDE = 16.0f;
 static const float SPIKEY_WAVE_SPEED = 0.025f;
+static const float FISH_ACC = 0.05f;
+static const float FISH_TARGET = 2.5f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
@@ -56,11 +58,20 @@ static void set_monster(MONSTER* m) {
         break;
 
     case 2:
-        m->canJump = true;
+        m->spcSwitch = true;
         break;
 
     case 3:
         m->spcTimer = 0.0f;
+        break;
+
+    case 4:
+        break;
+
+    case 5:
+
+        m->target.x = FISH_ACC * (m->pos.x > 128.f ? -1 : 1);
+        m->spcSwitch = false;
         break;
 
     default:
@@ -126,7 +137,7 @@ static void unique_movement(MONSTER* m, float tm) {
     // Slime
     case 2:
 
-        if(m->canJump) {
+        if(m->spcSwitch) {
 
             m->spcTimer -= 1.0f * tm;
             if(m->spcTimer <= 0.0f) {
@@ -145,7 +156,7 @@ static void unique_movement(MONSTER* m, float tm) {
                 m->speed.y = SLIME_JUMP_MIN + (float)(rand() % 1000) / 1000.0f * (SLIME_JUMP_MAX-SLIME_JUMP_MIN);
                 
 
-                m->canJump = false;
+                m->spcSwitch = false;
             }
         }
         else {
@@ -170,7 +181,7 @@ static void unique_movement(MONSTER* m, float tm) {
                 m->pos.y = m->startPos.y;
                 m->speed.y = 0.0f;
                 m->speed.x = 0.0f;
-                m->canJump = true;
+                m->spcSwitch = true;
             }
         }
 
@@ -181,6 +192,43 @@ static void unique_movement(MONSTER* m, float tm) {
 
         m->spcTimer += SPIKEY_WAVE_SPEED * tm;
         m->pos.y = m->startPos.y + sinf(m->spcTimer) * SPIKEY_AMPLITUDE;
+
+        break;
+
+    // Hedgehog
+    case 4:
+        break;
+
+    // Fish
+    case 5:
+
+        if(!m->spcSwitch) break;
+
+        // Update speed
+        if(m->target.x > 0.0f && m->speed.x < FISH_TARGET) {
+
+            m->speed.x += m->target.x * tm;
+            if(m->speed.x > FISH_TARGET)
+                m->speed.x = FISH_TARGET;
+
+            if(m->pos.x > 256.0f + 32.0f) {
+
+                m->exist = false;
+                m->dying = false;
+            }
+        }
+        else if(m->target.x < 0.0f && m->speed.x > -FISH_TARGET) {
+
+            m->speed.x += m->target.x * tm;
+            if(m->speed.x < -FISH_TARGET)
+                m->speed.x = -FISH_TARGET;
+
+            if(m->pos.x < 0.0f) {
+
+                m->exist = false;
+                m->dying = false;
+            }
+        }
 
         break;
 
@@ -216,7 +264,7 @@ static void animate_monster(MONSTER* m, float tm) {
     switch(m->id) {
 
     case 0:
-        spr_animate(&m->spr, m->id,0,3, 6, tm);
+        spr_animate(&m->spr, m->id,0,3,6, tm);
         m->flip = m->speed.x > 0.0f ? FLIP_H : FLIP_NONE;
         break;
 
@@ -231,7 +279,7 @@ static void animate_monster(MONSTER* m, float tm) {
 
         m->spr.row = m->id;
 
-        if(m->canJump)
+        if(m->spcSwitch)
             m->spr.frame = 0;
 
         else {
@@ -246,6 +294,11 @@ static void animate_monster(MONSTER* m, float tm) {
         m->flip = FLIP_NONE;
         break;
 
+    case 5:
+
+        spr_animate(&m->spr, m->id,0,3,4, tm);
+        m->flip = m->target.x > 0.0f ? FLIP_H : FLIP_NONE;
+        break;
 
     default:
         break;
@@ -395,8 +448,16 @@ void monster_draw(MONSTER* m) {
 void monster_goat_collision(MONSTER* m, GOAT* g) {
 
     const float GOAT_JUMP_BACK = -2.0f;
+    const float DELTA = 48.0f;
 
     if(!m->exist) return;
+
+    // If fish
+    if(m->id == 5 && !m->spcSwitch) {
+
+        if(fabs(g->pos.y-m->pos.y) < DELTA && !g->canJump)
+            m->spcSwitch = true;
+    }
 
     // If "spikey" (id 3)
     if(m->id == 3) {
@@ -469,7 +530,7 @@ void monster_goat_collision(MONSTER* m, GOAT* g) {
 // Monster-to-monster collision
 void monster_to_monster_collision(MONSTER* m1, MONSTER* m2) {
 
-    if(m1->exist == false || m2->exist == false)
+    if(m1->id == 5 || m2->id == 5 || m1->exist == false || m2->exist == false)
         return;
 
     // Check if vertically overlap
@@ -483,7 +544,7 @@ void monster_to_monster_collision(MONSTER* m1, MONSTER* m2) {
             if(m2->speed.x > 0.0f)
                 m2->speed.x *= -1;
 
-            if(m1->target.x > 0.0f)
+            if(m1->target.x < 0.0f)
                 m1->target.x *= -1;
 
             if(m2->target.x > 0.0f)
@@ -497,7 +558,7 @@ void monster_to_monster_collision(MONSTER* m1, MONSTER* m2) {
             if(m2->speed.x < 0.0f)
                 m2->speed.x *= -1;
 
-            if(m1->target.x < 0.0f)
+            if(m1->target.x > 0.0f)
                 m1->target.x *= -1;
 
             if(m2->target.x < 0.0f)

@@ -119,6 +119,22 @@ static void add_monster_to_platform(int sx, int leftx, int len, int y, bool grou
 }
 
 
+// Add a fish
+static void add_fish_to_platform(int y) {
+
+    int fishProb = 3;
+
+    if(rand() % fishProb != 0) return;
+
+    int dir = rand() % 2 == 0 ? 1 : -1;
+    float x = 128.0f - dir*128.0f;
+    float ypos = (float)y + floorf(get_global_camera()->pos.y) - 28.0f;
+
+    add_monster(x, ypos, 0, 256, 5);
+
+}
+
+
 // Create a new platform
 static void create_platform() {
 
@@ -254,6 +270,9 @@ static void create_platform() {
 
     // Add gems
     add_gems_to_platform(Y_POS);
+
+    // Maybe add a fish
+    add_fish_to_platform(Y_POS);
 
 }
 
