@@ -22,6 +22,7 @@ static const float GOAT_DASH_SPEED = 3.5f;
 static const float DASH_TIMER_MAX = 20.0f;
 static const float CLOUD_LIMIT = 30.0f;
 static const float HURT_TIME = 60.0f;
+static const float DASH_JUMP = -1.75f;
 
 // Bitmaps
 static BITMAP* bmpGoat;
@@ -95,7 +96,7 @@ static void control_goat(GOAT* g) {
     g->target.x = stick.x * GOAT_TARGET;
 
     // Gravity
-    g->target.y = GOAT_GRAVITY_TARGET;
+    g->target.y = g->dashing ? 0.0f : GOAT_GRAVITY_TARGET;
 
     // Jump
     if(g->canJump && vpad_get_button(0) == STATE_PRESSED) {
@@ -111,10 +112,23 @@ static void control_goat(GOAT* g) {
     }
 
     // Dash
-    g->dashing = (g->dashTimer < DASH_TIMER_MAX && !g->canJump && vpad_get_button(1) == STATE_DOWN);
-    if(!g->dashing && g->dashTimer > 0.0f)  {
+    if(g->dashTimer <= 0.0f && vpad_get_button(1) == STATE_PRESSED) {
+
+        g->dashing = true;
+        if(g->canJump) {
+
+            g->speed.y = DASH_JUMP;
+        }
+        else {
+
+            g->speed.y = 0.0f;
+        }
+    }
+
+    if(g->dashing && vpad_get_button(1) == STATE_RELEASED)  {
 
         g->dashTimer = DASH_TIMER_MAX;
+        g->dashing = false;
     }
 }
 
@@ -152,8 +166,8 @@ static void move_goat(GOAT* g, float tm) {
     // Dash
     if(g->dashing && g->dashTimer < DASH_TIMER_MAX) {
 
-        g->target.y = 0.0f;
-        g->speed.y = 0.0f;
+        // g->target.y = 0.0f;
+        // g->speed.y = 0.0f;
         g->dashing = true;
         g->speed.x = (g->flip == 0 ? 1 : -1) * GOAT_DASH_SPEED;
 
@@ -387,7 +401,9 @@ void goat_floor_collision(GOAT* g, float x, float y, float w) {
             g->pos.y = y;
             g->speed.y = 0.0f;
             g->canJump = true;
-            g->dashTimer = 0.0f;
+
+            if(!g->dashing)
+                g->dashTimer = 0.0f;
         }
     }
 }

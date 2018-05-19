@@ -22,6 +22,13 @@ static const float GEM_SPEED_X_MUL = 1.0f;
 static const float GEM_SPEED_Y = -1.25f;
 static const float FLIER_AMPLITUDE = 8.0f;
 static const float FLIER_WAVE_SPEED = 0.05f;
+static const int JUMP_WAIT_MIN = 30;
+static const int JUMP_WAIT_MAX = 60;
+static const float SLIME_GRAVITY = 0.125f;
+static const float SLIME_GRAVITY_MAX = 2.5f;
+static const float SLIME_JUMP_MIN = -1.5f;
+static const float SLIME_JUMP_MAX = -2.5f;
+static const float SLIME_SPEED_X = 0.625f;
 
 // Bitmaps
 static BITMAP* bmpMonsters;
@@ -41,9 +48,13 @@ static void set_monster(MONSTER* m) {
 
     case 1:
 
-        m->waveTimer = (float) (rand() % 1000) / 1000.0f * M_PI * 2;
+        m->spcTimer = (float) (rand() % 1000) / 1000.0f * M_PI * 2;
         m->direction = rand() % 2 == 0 ? 1 : -1;
         m->target.x = FLIER_SPEED * m->direction;
+        break;
+
+    case 2:
+        m->canJump = true;
         break;
 
     default:
@@ -56,8 +67,11 @@ static void set_monster(MONSTER* m) {
 // Unique movement
 static void unique_movement(MONSTER* m, float tm) {
 
+    const float DELTA = 16.0f;
+
     switch(m->id) {
 
+    // Walker
     case 0:
 
         // Limit collisions
@@ -73,6 +87,7 @@ static void unique_movement(MONSTER* m, float tm) {
         }
         break;
 
+    // Flier
     case 1:
 
         // Update speed
@@ -97,8 +112,61 @@ static void unique_movement(MONSTER* m, float tm) {
         }
 
         // "Waves"
-        m->waveTimer += FLIER_WAVE_SPEED * tm;
-        m->pos.y = m->startPos.y + sinf(m->waveTimer) * FLIER_AMPLITUDE;
+        m->spcTimer += FLIER_WAVE_SPEED * tm;
+        m->pos.y = m->startPos.y + sinf(m->spcTimer) * FLIER_AMPLITUDE;
+
+        break;
+
+    // Slime
+    case 2:
+
+        if(m->canJump) {
+
+            m->spcTimer -= 1.0f * tm;
+            if(m->spcTimer <= 0.0f) {
+
+                m->spcTimer = (float) (JUMP_WAIT_MIN + (rand() % (JUMP_WAIT_MAX-JUMP_WAIT_MIN)) );
+
+                // Calculate speeds
+                float direction = rand() % 2 == 0 ? 1 : -1;
+                if(m->pos.x - m->leftLimit < DELTA)
+                    direction = 1;
+                
+                else if(m->rightLimit - m->pos.x < DELTA)
+                    direction = -1;
+
+                m->speed.x = SLIME_SPEED_X * direction;
+                m->speed.y = SLIME_JUMP_MIN + (float)(rand() % 1000) / 1000.0f * (SLIME_JUMP_MAX-SLIME_JUMP_MIN);
+                
+
+                m->canJump = false;
+            }
+        }
+        else {
+
+            // Limit collisions
+            if( (m->speed.x < 0.0f && m->pos.x-8.0f < m->leftLimit)
+            || (m->speed.x > 0.0f && m->pos.x+8.0f > m->rightLimit) ) {
+
+                m->speed.x = 0.0f;
+            }
+
+            // Gravity
+            m->speed.y += SLIME_GRAVITY * tm;
+            if(m->speed.y >= SLIME_GRAVITY_MAX) {
+
+                m->speed.y = SLIME_GRAVITY_MAX;
+            }
+
+            // Ground collision (pseudo)
+            if(m->pos.y > m->startPos.y) {
+
+                m->pos.y = m->startPos.y;
+                m->speed.y = 0.0f;
+                m->speed.x = 0.0f;
+                m->canJump = true;
+            }
+        }
 
         break;
 
@@ -142,6 +210,22 @@ static void animate_monster(MONSTER* m, float tm) {
 
         spr_animate(&m->spr, m->id,0,3, 5, tm);
         m->flip = FLIP_NONE;
+        break;
+
+    case 2:
+
+        m->spr.row = m->id;
+
+        if(m->canJump)
+            m->spr.frame = 0;
+
+        else {
+            
+            m->spr.frame = m->speed.y < 0.0f ? 1 : 2;
+            m->flip = m->speed.x > 0.0f ? FLIP_H : FLIP_NONE;
+        }
+        
+        
         break;
 
     default:

@@ -86,21 +86,28 @@ static void add_gems_to_platform(float y) {
 // Add a monster to a platform
 static void add_monster_to_platform(int sx, int leftx, int len, int y, bool ground) {
 
+    const int MAX_ID = 3;
+
     // Monster probability
     int monsterProb = 3;
     if(rand() % monsterProb != 0) return;
 
-    bool groundType[] = {true, false};
-    float yPositions[] = {0.0f, -14.0f};
+    bool groundType[] = {true, false, true};
+    float yPositions[] = {0.0f, -14.0f, 0.0f};
 
     // Get random monster ID
-    int id = rand() % 2;
+    int id = rand() % 3;
 
     // If the enemy type is not suitable, get another one
     if(groundType[id] != ground) {
 
-        // TODO: Other ids?
-        id = ground ? 0 : 1;
+        while(true) {
+
+            ++ id;
+            id %= MAX_ID;
+            if(groundType[id] == ground)
+                break;
+        }
     }
 
     int x = sx + rand() % (len-1);

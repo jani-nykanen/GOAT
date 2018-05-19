@@ -19,7 +19,8 @@ typedef struct {
     VEC2 deathSpeed;
     VEC2 target;
 
-    float waveTimer;
+    float spcTimer;
+    bool canJump;
     
     int id;
     int flip;

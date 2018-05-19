@@ -39,7 +39,7 @@ typedef struct {
 
     bool canJump;
     bool dashing;
-
+    
     CLOUD clouds[CLOUD_COUNT];
     float cloudTimer;
 }
