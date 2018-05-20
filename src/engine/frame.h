@@ -23,4 +23,7 @@ FRAME* frame_create(Uint16 w, Uint16 h);
 // Destroy a frame
 void frame_destroy(FRAME* f);
 
+// Copy the content of a frame to another frame of the same size
+void frame_copy(FRAME* src, FRAME* dst);
+
 #endif // __FRAME__

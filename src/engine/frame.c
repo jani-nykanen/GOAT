@@ -48,3 +48,13 @@ void frame_destroy(FRAME* f) {
     free(f->data);
     free(f);
 }
+
+
+// Copy the content of a frame to another
+void frame_copy(FRAME* src, FRAME* dst) {
+
+    if(src->width != dst->width || src->height != dst->height)
+        return;
+
+    memcpy(dst->data, src->data, src->width * src->height);
+}

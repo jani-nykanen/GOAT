@@ -10,6 +10,7 @@
 #include "status.h"
 #include "gem.h"
 #include "monster.h"
+#include "pause.h"
 
 #include "../global.h"
 #include "../vpad.h"
@@ -23,9 +24,6 @@ static const float INITIAL_GLOBAL_SPEED = 0.5f;
 static const float SPEED_UP_INTERVAL = 20.0f * 60.f;
 static const float SPEED_UP = 0.1f;
 static const int MAX_UP = 10;
-
-// Bitmaps
-static BITMAP* bmpFont;
 
 // Global speed
 static float globalSpeed;
@@ -62,7 +60,6 @@ static int game_init() {
 
     // Get assets
     ASSET_PACK* ass = global_get_asset_pack();
-    bmpFont = (BITMAP*)assets_get(ass, "font");
 
     // Initialize components
     stage_init(ass);
@@ -71,6 +68,9 @@ static int game_init() {
     init_status(ass);
     init_gems(ass);
     init_monsters(ass);
+    
+    if(init_pause(ass) == 1)
+        return 1;
 
     // Set default values
     paused = false;
@@ -88,11 +88,19 @@ static void game_update(float tm) {
     int i = 0;
     int i2 = 0;
 
-    // Check pause
-    if(vpad_get_button(2) == STATE_PRESSED)
-        paused = !paused;
+    // If paused
+    if(pause_is_active()) {
 
-    if(paused) return;
+        pause_update(tm);
+        return;
+    }
+
+    // Check pause
+    if(vpad_get_button(2) == STATE_PRESSED) {
+
+        pause_active();
+        return;
+    }
 
     // Update stage
     stage_update(globalSpeed, tm);
@@ -137,6 +145,13 @@ static void game_update(float tm) {
 static void game_draw() {
 
     const int SHAKE_COUNT = 7;
+
+    // If pause active, draw it and ignore the rest
+    if(pause_is_active()) {
+
+        pause_draw();
+        return;
+    }
 
     int shakeX = 0;
     int shakeY = 0;
