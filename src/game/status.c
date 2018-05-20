@@ -11,6 +11,8 @@
 static float HEALTH_FADE_MAX = 30.0f;
 static int HEALTH_MAX = 3;
 static int SCORE_BASE = 10;
+static float HIDE_MAX = 30.0f;
+static float APPEAR_MAX = 60.0f;
 
 // Status variables
 static int health;
@@ -24,6 +26,11 @@ static bool isGameOver;
 static BITMAP* bmpHUD;
 static BITMAP* bmpFont;
 static BITMAP* bmpFontBig;
+
+// Hide timer
+static float hideTimer;
+// Appear timer
+static float appearTimer;
 
 
 // Get score string
@@ -71,6 +78,8 @@ void reset_status() {
     score = 0;
     coins = 0;
     isGameOver = false;
+    hideTimer = 0.0f;
+    appearTimer = 0.0f;
 }
 
 
@@ -83,6 +92,18 @@ void status_update(float tm) {
         healthFadeTimer -= 1.0f * tm;
         if(healthFadeTimer <= 0.0f)
             healthFade = 0;
+    }
+
+    // Update hide timer (if game over)
+    if(isGameOver && hideTimer < HIDE_MAX) {
+
+        hideTimer += 1.0f * tm;
+    }
+
+    // Update appear timer
+    if(appearTimer < APPEAR_MAX) {
+
+        appearTimer += 1.0f * tm;
     }
 }
 
@@ -102,6 +123,25 @@ void status_draw() {
     int i = 0;
     int sx = 0;
     char str[16];
+
+    // If game over & hiding
+    if(isGameOver) {
+
+        if(hideTimer < HIDE_MAX) {
+
+            int p = -(int)floorf(hideTimer / HIDE_MAX * 32.0f);
+            translate(0, p);
+        }
+        else
+            return;
+    }
+
+    // If appear timer
+    if(appearTimer < APPEAR_MAX) {
+
+        int p = -32.0 + (int)floorf(appearTimer / APPEAR_MAX * 32.0f);
+            translate(0, p);
+    }
 
     int hmax = healthFade == 2 ? health-2 : health-1;
 

@@ -203,6 +203,7 @@ static void game_draw() {
     status_draw();
 
     // Draw game over
+    translate(0, 0);
     gover_draw();
 }
 
@@ -232,7 +233,7 @@ void game_reset() {
     speedCounter = 0;
 
     // (Re)create game objects
-    player = create_goat(vec2(128.0f,0.0));
+    player = create_goat(vec2(128.0f,-4.0f));
     for(i = 0; i < GEM_COUNT; ++ i) {
 
         gems[i].exist = false;
@@ -247,6 +248,7 @@ void game_reset() {
     // Reset components
     stage_reset();
     reset_status();
+    gover_reset();
 }
 
 

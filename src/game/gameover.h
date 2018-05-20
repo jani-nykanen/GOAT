@@ -16,4 +16,7 @@ void gover_update(float tm);
 // Draw
 void gover_draw();
 
+// Reset game over
+void gover_reset();
+
 #endif // __GAME_OVER__
