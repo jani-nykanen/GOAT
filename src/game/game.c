@@ -88,6 +88,9 @@ static void game_update(float tm) {
     int i = 0;
     int i2 = 0;
 
+    // Do not update if fading
+    if(is_fading()) return;
+
     // If paused
     if(pause_is_active()) {
 

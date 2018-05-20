@@ -10,6 +10,9 @@
 #include "include/renderer.h"
 #include "include/system.h"
 
+// Constants
+static float FADE_MAX = 60.0f;
+
 // Global assets
 static ASSET_PACK* globalAssets;
 
@@ -52,8 +55,8 @@ static int global_init() {
     vpad_read_config(c.keyconfPath);
 
     // Set default values
-    fadeMode = 0;
-    fadeTimer = 0.0f;
+    fadeMode = 1;
+    fadeTimer = FADE_MAX;
     fadeSpeed = 2.0f;
 
     return 0;
@@ -70,7 +73,7 @@ static void global_update(float tm) {
     if(fadeMode != 0) {
 
         fadeTimer += fadeSpeed * tm;
-        if(fadeTimer >= 60.0f) {
+        if(fadeTimer >= FADE_MAX) {
             
             if(fadeMode == 1) {
 
@@ -99,11 +102,11 @@ static void global_draw() {
         int dvalue = 0;
         if(fadeMode == 1) {
 
-            dvalue = (int)(fadeTimer/60.0f * 14.0f);
+            dvalue = (int)(fadeTimer/FADE_MAX * 14.0f);
         }
         else {
 
-            dvalue = (int)((1.0f-fadeTimer/60.0f) * 14.0f);
+            dvalue = (int)((1.0f-fadeTimer/FADE_MAX) * 14.0f);
         }
 
         darken(dvalue);

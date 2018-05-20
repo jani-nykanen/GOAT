@@ -32,6 +32,9 @@ FRAME* frame_create(Uint16 w, Uint16 h) {
     // Set data
     f->data = data;
 
+    // Clear
+    memset(f->data,0, (int)w*h);
+
     // Set dimensions
     f->width = w;
     f->height = h;

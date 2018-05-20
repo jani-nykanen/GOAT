@@ -189,7 +189,7 @@ static int core_init() {
         return 1;
     }
     bind_frame(canvas);
-
+    update_canvas_texture();
 
     int i = 0;
     SCENE s;
