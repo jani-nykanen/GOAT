@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Renderer headers (include)
 // (c) 2018 Jani Nykänen
 

@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Virtual gamepad (header)
 // (c) 2018 Jani Nykänen
 

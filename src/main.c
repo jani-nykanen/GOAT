@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Main (source)
 // (c) 2018 Jani Nykänen
 

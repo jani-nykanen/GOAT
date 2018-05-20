@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Frame (source)
 // (c) 2018 Jani Nykänen
 

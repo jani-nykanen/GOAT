@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Status (header)
 // (c) 2018 Jani Nykänen
 
@@ -30,5 +30,8 @@ void status_add_coin();
 
 // Add score
 void status_add_score();
+
+// Is the game over
+bool status_is_game_over();
 
 #endif // __STATUS__

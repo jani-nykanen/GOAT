@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Status (header)
 // (c) 2018 Jani Nykänen
 
@@ -18,6 +18,7 @@ static float healthFadeTimer;
 static int healthFade;
 static unsigned int score;
 static int coins;
+static bool isGameOver;
 
 // Bitmap
 static BITMAP* bmpHUD;
@@ -69,6 +70,7 @@ void reset_status() {
     healthFade = 0;
     score = 0;
     coins = 0;
+    isGameOver = false;
 }
 
 
@@ -156,9 +158,17 @@ void status_draw() {
 // Reduce health
 void status_reduce_health() {
 
-    -- health;
+    if(health <= 0) return;
+
+    if(-- health == 0) {
+
+        isGameOver = true;
+        return;
+    }
+    
     healthFadeTimer = HEALTH_FADE_MAX;
     healthFade = 1;
+
 }
 
 
@@ -184,4 +194,11 @@ void status_add_coin() {
 void status_add_score() {
 
     score += SCORE_BASE + coins;
+}
+
+
+// Is the game over
+bool status_is_game_over() {
+
+    return isGameOver;
 }

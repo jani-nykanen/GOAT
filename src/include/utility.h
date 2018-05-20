@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Utility headers (include)
 // (c) 2018 Jani Nykänen
 

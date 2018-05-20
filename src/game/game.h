@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Game scene (header)
 // (c) 2018 Jani Nykänen
 
@@ -26,6 +26,9 @@ void add_monster(float x, float y, float left, float right, int id);
 
 // Get the amount of speed ups
 int get_speed_up_count();
+
+// Get global speed
+float get_global_speed();
 
 #endif // __GAME__
 

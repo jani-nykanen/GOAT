@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Goat (source)
 // (c) 2018 Jani Nykänen
 
@@ -23,6 +23,7 @@ static const float DASH_TIMER_MAX = 20.0f;
 static const float CLOUD_LIMIT = 30.0f;
 static const float HURT_TIME = 60.0f;
 static const float DASH_JUMP = -1.75f;
+static const float DEATH_TIMER_MAX = 60.0f;
 
 // Bitmaps
 static BITMAP* bmpGoat;
@@ -46,12 +47,7 @@ static void generate_clouds(GOAT* g, float tm) {
     const float CLOUD_TIMER_LIMIT = 6.0f;
     const float DELTA = 0.25f;
 
-    // Update clouds
-    int i = 0;
-    for(; i < CLOUD_COUNT; ++ i) {
-
-        update_cloud(&g->clouds[i], tm);
-    }
+    int i;
 
     // If not moving, don't generate
     if(g->canJump && hypotf(g->speed.x,g->speed.y) <= DELTA)
@@ -281,6 +277,27 @@ static void draw_single_goat(GOAT* g, int x, int y) {
     else
         -- x;
 
+    // Dying
+    if(status_is_game_over()) {
+
+        if(!g->dead) {
+
+            int fade = 1 + (int)floor(g->deathTimer / DEATH_TIMER_MAX * 10.0f);
+            draw_bitmap_region_fading(
+                bmpGoat,
+                g->spr.frame * g->spr.w,
+                g->spr.row * g->spr.h,
+                g->spr.w, g->spr.h,
+                x, y,
+                g->flip, 
+                fade, get_alpha()
+            );
+        }
+
+        return;
+    }
+    
+
     if(g->hurtTimer <= 0.0f || (int)floor(g->hurtTimer/4) % 2 == 0)
         spr_draw(&g->spr,bmpGoat,x,y, g->flip);
 
@@ -327,6 +344,8 @@ GOAT create_goat(VEC2 p) {
     g.dashTimer = 0.0f;
     g.hurtTimer = 0.0f;
     g.touchedGround = false;
+    g.deathTimer = DEATH_TIMER_MAX;
+    g.dead = false;
 
     int i = 0;
     for(; i < CLOUD_COUNT; ++ i) {
@@ -341,8 +360,33 @@ GOAT create_goat(VEC2 p) {
 // Update goat
 void goat_update(GOAT* g, float tm) {
 
+    int i = 0;
     const float DELTA = -0.1f;
 
+    // Update clouds
+    for(; i < CLOUD_COUNT; ++ i) {
+
+        update_cloud(&g->clouds[i], tm);
+    }
+
+    // Hurt timer
+    if(g->hurtTimer > 0.0f)
+        g->hurtTimer -= 1.0f * tm;
+
+    // If game over, die if not already dead
+    if(status_is_game_over()) {
+
+        if(!g->dead) {
+
+            g->deathTimer -= 1.0f * tm;
+            if(g->deathTimer <= 0.0f)
+                g->dead = true;
+        }
+
+        return;
+    }
+
+    // Update basic things
     control_goat(g);
     move_goat(g, tm);
     animate_goat(g, tm);
@@ -350,17 +394,17 @@ void goat_update(GOAT* g, float tm) {
 
     g->canJump = false;
 
-    // Hurt timer
-    if(g->hurtTimer > 0.0f)
-        g->hurtTimer -= 1.0f * tm;
-
     // Death
     int camY = (int)get_global_camera()->pos.y;
 
     if(g->touchedGround && 
       (g->pos.y > camY+192+24 || (g->speed.y >= DELTA && g->pos.y <= camY) ) ) {
 
-        game_reset();
+        // Kill
+        for(i = 0; i < 3; ++ i) {
+
+            status_reduce_health();
+        }
     }
 }
 
@@ -399,6 +443,8 @@ void goat_floor_collision(GOAT* g, float x, float y, float w) {
     const float WIDTH = 8;
     const float DELTA = 1.0f;
 
+    if(g->dead) return;
+
     if(g->pos.x >= x-WIDTH && g->pos.x < x+w+WIDTH) {
 
         if(g->speed.y > 0.0f && g->oldY < y+DELTA && g->pos.y > y-DELTA) {
@@ -422,7 +468,7 @@ void goat_hurt_collision(GOAT* g, float x, float y, float w, float h) {
     const float DIM_X = 8.0f;
     const float DIM_Y = 16.0f;
 
-    if(g->hurtTimer > 0.0f) return;
+    if(g->hurtTimer > 0.0f || g->dead) return;
 
     // Check if inside the actual goat or those "off-screen entities"
     if(hurt(g->pos,DIM_X,DIM_Y,x,y,w,h)

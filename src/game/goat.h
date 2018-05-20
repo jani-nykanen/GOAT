@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Goat (header)
 // (c) 2018 Jani Nykänen
 
@@ -40,6 +40,8 @@ typedef struct {
     bool canJump;
     bool dashing;
     bool touchedGround;
+    bool dead;
+    float deathTimer;
     
     CLOUD clouds[CLOUD_COUNT];
     float cloudTimer;

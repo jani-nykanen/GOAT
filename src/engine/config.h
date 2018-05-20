@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Configuration (header)
 // (c) 2018 Jani Nykänen
 

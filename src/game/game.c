@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Game scene (source)
 // (c) 2018 Jani Nykänen
 
@@ -11,11 +11,13 @@
 #include "gem.h"
 #include "monster.h"
 #include "pause.h"
+#include "gameover.h"
 
 #include "../global.h"
 #include "../vpad.h"
 
 #include "../include/system.h"
+#include "../include/audio.h"
 
 // Constants
 #define GEM_COUNT 16
@@ -61,6 +63,9 @@ static int game_init() {
     // Get assets
     ASSET_PACK* ass = global_get_asset_pack();
 
+    // Play music
+    fade_in_music((MUSIC*)assets_get(ass, "theme"), 0.50f, -1, 1000);
+
     // Initialize components
     stage_init(ass);
     init_goat(ass);
@@ -68,7 +73,8 @@ static int game_init() {
     init_status(ass);
     init_gems(ass);
     init_monsters(ass);
-    
+    init_game_over(ass);
+
     if(init_pause(ass) == 1)
         return 1;
 
@@ -99,7 +105,8 @@ static void game_update(float tm) {
     }
 
     // Check pause
-    if(vpad_get_button(2) == STATE_PRESSED) {
+    if(!status_is_game_over() 
+     && vpad_get_button(2) == STATE_PRESSED) {
 
         pause_active();
         return;
@@ -141,6 +148,9 @@ static void game_update(float tm) {
 
     // Update global speed
     update_speed(tm);
+
+    // Update game over
+    gover_update(tm);
 }
 
 
@@ -191,6 +201,9 @@ static void game_draw() {
     // Draw status
     translate(0, 0);
     status_draw();
+
+    // Draw game over
+    gover_draw();
 }
 
 
@@ -299,4 +312,11 @@ void add_monster(float x, float y, float left, float right, int id) {
 int get_speed_up_count() {
 
     return upCounter;
+}
+
+
+// Get global speed
+float get_global_speed() {
+
+    return globalSpeed;
 }

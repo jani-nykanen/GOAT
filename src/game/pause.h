@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Pause menu (header)
 // (c) 2018 Jani Nykänen
 

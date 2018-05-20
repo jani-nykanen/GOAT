@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Stage (source)
 // (c) 2018 Jani Nykänen
 
@@ -122,12 +122,18 @@ static void add_monster_to_platform(int sx, int leftx, int len, int y, bool grou
     // If the enemy type is not suitable, get another one
     if(groundType[id] != ground) {
 
+        int loop =0;
         while(true) {
 
             ++ id;
             id %= maxID;
             if(groundType[id] == ground)
                 break;
+
+            if(++ loop >= maxID) {
+
+                id = ground ? 1 : 0;
+            }
         }
     }
 
@@ -523,12 +529,15 @@ void stage_update(float globalSpeed, float tm) {
         cloudPos += (int)bmpClouds->width;
     }
 
-    // Create platforms
-    platTimer += 1.0f * tm * globalSpeed;
-    if(platTimer >= PLATFORM_INTERVAL) {
+    // Create platforms (if not game over)
+    if(!status_is_game_over()) {
+        
+        platTimer += 1.0f * tm * globalSpeed;
+        if(platTimer >= PLATFORM_INTERVAL) {
 
-        platTimer -= PLATFORM_INTERVAL;
-        create_platform();
+            platTimer -= PLATFORM_INTERVAL;
+            create_platform();
+        }
     }
 
     // Update platforms

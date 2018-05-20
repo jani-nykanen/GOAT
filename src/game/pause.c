@@ -1,4 +1,4 @@
-// <Insert project name here>
+// GOAT
 // Pause menu (header)
 // (c) 2018 Jani Nykänen
 
@@ -20,6 +20,8 @@ static const int PAUSE_BOX_H = 88;
 static const float CURSOR_AMPLITUDE = 2.0f;
 static const float CURSOR_WAVE_SPEED = 0.1f;
 static const float MOVE_TIMER_MAX = 8.0f;
+static const float DARK_INTERVAL = 4.0f;
+static const int DARK_MAX = 4;
 
 // Bitmaps
 static BITMAP* bmpFont;
@@ -39,6 +41,11 @@ static float moveTimer;
 static bool moving;
 // Cursor direction
 static int cursorDir;
+
+// Dark timer
+static float darkTimer;
+// Dark count
+static int darkCount;
 
 // Is active
 static bool active;
@@ -79,6 +86,11 @@ static void menu_action() {
     case 1:
         fade(1, 2.0f, game_reset);
         active = false;
+        return;
+
+    // Full screen
+    case 2:
+        core_toggle_fullscreen();
         return;
 
     // Quit
@@ -123,6 +135,17 @@ void pause_update(float tm) {
 
     const float DELTA = 0.5f;
 
+    // Update darkness
+    if(darkCount < DARK_MAX) {
+
+        darkTimer += 1.0f * tm;
+        if(darkTimer >= DARK_INTERVAL) {
+
+            ++ darkCount;
+            darkTimer -= DARK_INTERVAL;
+        }
+    }
+
     // Update cursor wave
     cursorWave += CURSOR_WAVE_SPEED * tm;
 
@@ -136,7 +159,7 @@ void pause_update(float tm) {
             return;
     }
 
-    // If pause button pressed, make inactive (temp)
+    // If pause button pressed, take action
     if(vpad_get_button(2) == STATE_PRESSED ||
        vpad_get_button(0) == STATE_PRESSED ) {
 
@@ -177,6 +200,9 @@ void pause_draw() {
     // Draw canvas copy
     draw_bitmap_fast((BITMAP*)canvasCopy,0,0);
 
+    // Darken
+    darken(darkCount);
+
     // Draw box
     draw_pause_box(x,y,  PAUSE_BOX_W, PAUSE_BOX_H);
 
@@ -211,12 +237,9 @@ void pause_active() {
     cursorWave = 0.0f;
     moving = false;
     moveTimer = 0.0f;
+    darkTimer = 0.0f;
+    darkCount = 0;
 
     // Create a copy of the canvas
     frame_copy(get_global_frame(), canvasCopy);
-
-    // Darken
-    set_render_target(canvasCopy);
-    darken(2);
-    set_render_target(NULL);
 }
