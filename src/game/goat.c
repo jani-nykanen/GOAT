@@ -92,11 +92,13 @@ static void control_goat(GOAT* g) {
     if(fabsf(stick.x) <= DELTA)
         stick.x = 0.0f;
 
-    // Horizontal movement
-    g->target.x = stick.x * GOAT_TARGET;
-
     // Gravity
     g->target.y = g->dashing ? 0.0f : GOAT_GRAVITY_TARGET;
+
+    if(!g->touchedGround) return;
+
+    // Horizontal movement
+    g->target.x = stick.x * GOAT_TARGET;
 
     // Jump
     if(g->canJump && vpad_get_button(0) == STATE_PRESSED) {
@@ -324,6 +326,7 @@ GOAT create_goat(VEC2 p) {
     g.dashing = false;
     g.dashTimer = 0.0f;
     g.hurtTimer = 0.0f;
+    g.touchedGround = false;
 
     int i = 0;
     for(; i < CLOUD_COUNT; ++ i) {
@@ -353,7 +356,9 @@ void goat_update(GOAT* g, float tm) {
 
     // Death
     int camY = (int)get_global_camera()->pos.y;
-    if(g->pos.y > camY+192+24 || (g->speed.y >= DELTA && g->pos.y <= camY) ) {
+
+    if(g->touchedGround && 
+      (g->pos.y > camY+192+24 || (g->speed.y >= DELTA && g->pos.y <= camY) ) ) {
 
         game_reset();
     }
@@ -397,6 +402,8 @@ void goat_floor_collision(GOAT* g, float x, float y, float w) {
     if(g->pos.x >= x-WIDTH && g->pos.x < x+w+WIDTH) {
 
         if(g->speed.y > 0.0f && g->oldY < y+DELTA && g->pos.y > y-DELTA) {
+
+            g->touchedGround = true;
 
             g->pos.y = y;
             g->speed.y = 0.0f;

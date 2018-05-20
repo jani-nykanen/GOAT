@@ -55,7 +55,7 @@ static void create_first_platform() {
         p->decorations[i] = -1;
         p->tiles[i] = i >= 4 && i < TILE_COUNT-4 ? 1 : 0;
     }
-    p->y = 192 +48 - 64;
+    p->y = 192 +48;
     p->exist = true;
     p->scored = true;
 }
@@ -595,7 +595,7 @@ void stage_reset() {
 
     // Set default values
     cloudPos = 0.0f;
-    platTimer = PLATFORM_INTERVAL;
+    platTimer = 0.0f;
 
     int i = 0;
     for(; i < PLATFORM_COUNT; ++ i) {

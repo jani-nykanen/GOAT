@@ -201,7 +201,7 @@ void game_reset() {
     speedCounter = 0;
 
     // (Re)create game objects
-    player = create_goat(vec2(128.0f,192.0f - 18.0f));
+    player = create_goat(vec2(128.0f,0.0));
     for(i = 0; i < GEM_COUNT; ++ i) {
 
         gems[i].exist = false;
