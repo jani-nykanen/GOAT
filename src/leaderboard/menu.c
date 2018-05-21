@@ -10,6 +10,7 @@
 #include "../vpad.h"
 
 #include "../game/status.h"
+#include "../game/game.h"
 
 #include "../include/std.h"
 #include "../include/system.h"
@@ -22,6 +23,7 @@ static const float DARK_MAX = 4;
 static const int DARK_INTERVAL = 4.0f;
 static const int NP_FLASH_MAX = 20.0f;
 #define NAME_LENGTH 10
+#define ERROR_SIZE 256
 
 // Canvas copy
 static FRAME* canvasCopy;
@@ -54,6 +56,8 @@ static bool toBeSent;
 static LEADERBOARD lb;
 // Result
 static int result;
+// Error buffer
+static char errBuffer[ERROR_SIZE];
 
 
 // Send the data
@@ -108,6 +112,19 @@ static void draw_sending_box(int x, int y, int w, int h) {
 
     // Draw text
     draw_text(bmpFont, "Sending...", x+w/2,y+2, -7,0, true);
+}
+
+
+// Draw error message
+static void draw_error(int x, int y, int w, int h) {
+
+    // Draw box
+    draw_box(x,y,w,h);
+
+    // Draw text
+    draw_text(bmpFont, "ERROR:", x+w/2,y+2, -7,0, true);
+    draw_text(bmpFont, (const char*)errBuffer, x+4,y+16, -7,0, false);
+
 }
 
 
@@ -181,12 +198,44 @@ static void do_sending(float tm) {
 
             if(state == 1) {
 
-                printf("ERROR: %s\n", error_get_message());
-                error_flush();
-            }
+                // Copy error
+                snprintf(errBuffer, ERROR_SIZE, "%s", error_get_message());
 
-            mode = LB_MENU_SHOW;
+                mode = LB_MENU_ERROR;
+            }
+            else 
+                mode = LB_MENU_SHOW;
         }
+    }
+}
+
+
+// Error screen update
+static void update_error_screen(float tm) {
+
+    if(vpad_get_button(0) == STATE_PRESSED ||
+       vpad_get_button(2) == STATE_PRESSED) {
+
+        core_swap_scene("game");
+    }
+}
+
+
+// Go to the game scene
+static void go_to_game() {
+
+    core_swap_scene("game");
+    game_reset();
+}
+
+
+// Update results screen
+static void update_results_screen(float tm) {
+
+    if(vpad_get_button(0) == STATE_PRESSED ||
+       vpad_get_button(2) == STATE_PRESSED) {
+
+        fade(1, 2.0f, go_to_game);
     }
 }
 
@@ -236,8 +285,16 @@ static void lb_menu_update(float tm) {
         }
     }    
 
-    // If submit box, get input
-    if(mode == LB_MENU_SUBMIT) {
+    switch(mode) {
+
+    // Show
+    case LB_MENU_SHOW:
+
+        update_results_screen(tm);
+        break;
+
+    // Submit box
+    case LB_MENU_SUBMIT:
 
         if(vpad_get_button(3) == STATE_PRESSED) {
 
@@ -246,13 +303,22 @@ static void lb_menu_update(float tm) {
         }
 
         name_input(tm);
-        return;
-    }
-    // Or if sending
-    else if(mode == LB_MENU_SENDING) {
+        break;
+    
+    // Sending
+    case LB_MENU_SENDING:
 
         do_sending(tm);
-        return;
+        break;
+
+    // Error
+    case LB_MENU_ERROR:
+
+        update_error_screen(tm);
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -264,6 +330,8 @@ static void lb_menu_draw() {
     const int SUBMIT_H = 48;
     const int SENDING_W = 128;
     const int SENDING_H = 16;
+    const int ERROR_W = 192;
+    const int ERROR_H = 64;
 
     // Draw canvas copy
     draw_bitmap_fast(canvasCopy, 0, 0);
@@ -288,6 +356,15 @@ static void lb_menu_draw() {
             96 - SENDING_H/2,
             SENDING_W,
             SENDING_H 
+        );
+    }
+    else if(mode == LB_MENU_ERROR) {
+
+        draw_error(
+            128 - ERROR_W/2,
+            96 - ERROR_H/2,
+            ERROR_W,
+            ERROR_H 
         );
     }
 }

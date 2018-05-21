@@ -103,7 +103,7 @@ static int send_request(const char* req) {
 
         char errCode[16];
         snprintf(errCode, 16, "%d", (int)success);
-        error_throw("Failed to send an http request! Error code:", errCode);
+        error_throw("Failed to send an\nhttp request!\nError code:", errCode);
         return 1;
     }
 
