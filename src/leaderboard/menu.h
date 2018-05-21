@@ -18,6 +18,6 @@ enum {
 void set_lb_menu_type(int type);
 
 // Get leaderboard menu scene
-SCENE get_lb_menu_scene();
+SCENE lb_menu_get_scene();
 
 #endif // __LB_MENU__

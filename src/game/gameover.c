@@ -10,6 +10,8 @@
 #include "../vpad.h"
 #include "../global.h"
 
+#include "../leaderboard/menu.h"
+
 #include "../include/renderer.h"
 #include "../include/std.h"
 
@@ -111,7 +113,8 @@ static void menu_action() {
 
     // Submit score
     case 1:
-
+        set_lb_menu_type(LB_MENU_SUBMIT);
+        core_swap_scene("lbmenu");
         break;
 
     // Return
@@ -151,6 +154,20 @@ void gover_update(float tm) {
     if(goverTimer < GOVER_MAX)
         goverTimer += 1.0f * tm;
 
+    else {
+
+        // Keyboard pressed
+        if(vpad_get_button(2) == STATE_PRESSED ||
+        vpad_get_button(0) == STATE_PRESSED ) {
+
+            menu_action();
+            return;
+        }
+
+        // Update cursor wave
+        cursorWave += CURSOR_WAVE_SPEED * tm;
+    }
+
     // Move
     if(moving) {
 
@@ -161,17 +178,8 @@ void gover_update(float tm) {
             return;
     }
 
-    // Keyboard pressed (TEMP)
-    if(vpad_get_button(2) == STATE_PRESSED ||
-       vpad_get_button(0) == STATE_PRESSED ) {
-
-        menu_action();
-        return;
-    }
-
-    // Update waves
+    // Update text wave
     waveTimer += WAVE_SPEED * tm;
-    cursorWave += CURSOR_WAVE_SPEED * tm;
 
     // Move cursor
     int oldPos = cursorPos;
@@ -205,6 +213,13 @@ void gover_draw() {
 
     // Draw game over text
     draw_game_over_text((256-240) / 2, 48);
+
+    // Translate, if not ready yet
+    if(goverTimer < GOVER_MAX) {
+        
+        int p =  56 - (int)floorf(goverTimer / GOVER_MAX * 56.0f );
+        translate(0, p);
+    }
 
     // Draw menu text
     draw_menu_text(POS_X, POS_Y, YOFF);
