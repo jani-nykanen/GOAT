@@ -40,6 +40,9 @@ static MONSTER monsters[MONSTER_COUNT];
 // Is paused
 static bool paused;
 
+// Samples
+static SAMPLE* sPause;
+
 
 // Update speed
 static void update_speed(float tm) {
@@ -62,6 +65,7 @@ static int game_init() {
 
     // Get assets
     ASSET_PACK* ass = global_get_asset_pack();
+    sPause = (SAMPLE*)assets_get(ass, "pause");
 
     // Play music
     fade_in_music((MUSIC*)assets_get(ass, "theme"), 0.40f, -1, 1000);
@@ -109,6 +113,7 @@ static void game_update(float tm) {
      && (vpad_get_button(2) == STATE_PRESSED
      || vpad_get_button(3) == STATE_PRESSED) ) {
 
+        play_sample(sPause, 0.70f);
         pause_active();
         return;
     }

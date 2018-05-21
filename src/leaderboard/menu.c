@@ -15,6 +15,7 @@
 #include "../include/std.h"
 #include "../include/system.h"
 #include "../include/renderer.h"
+#include "../include/audio.h"
 
 #include "../lib/tinycthread.h"
 
@@ -35,6 +36,10 @@ static int darkCount;
 // Bitmaps
 static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
+
+// Samples
+static SAMPLE* sAccept;
+static SAMPLE* sReject;
 
 // Mode
 static int mode;
@@ -180,6 +185,7 @@ static void name_input(float tm) {
     // Accept
     if(namePointer > 0 && vpad_get_button(2) == STATE_PRESSED) {
 
+        play_sample(sAccept, 0.80f);
         mode = LB_MENU_SENDING;
         toBeSent = true;
         return;
@@ -241,6 +247,7 @@ static void do_sending(float tm) {
                 snprintf(errBuffer, ERROR_SIZE, "%s", error_get_message());
 
                 mode = LB_MENU_ERROR;
+                play_sample(sReject, 0.80f);
             }
             else 
                 mode = LB_MENU_SHOW;
@@ -286,6 +293,9 @@ static int lb_menu_init() {
     ASSET_PACK* ass = global_get_asset_pack();
     bmpFont = (BITMAP*)assets_get(ass, "font");
     bmpFont2 = (BITMAP*)assets_get(ass, "font2"); 
+
+    sAccept = (SAMPLE*)assets_get(ass, "accept");
+    sReject = (SAMPLE*)assets_get(ass, "reject");
 
     // Set defaults
     mode = 0;
@@ -338,6 +348,7 @@ static void lb_menu_update(float tm) {
 
         if(vpad_get_button(3) == STATE_PRESSED) {
 
+            play_sample(sReject, 0.70f);
             core_swap_scene("game");
             return;
         }

@@ -11,6 +11,7 @@
 #include "../vpad.h"
 
 #include "../include/std.h"
+#include "../include/audio.h"
 
 // Constants
 static const float GOAT_SPEED = 0.15f;
@@ -27,6 +28,12 @@ static const float DEATH_TIMER_MAX = 60.0f;
 
 // Bitmaps
 static BITMAP* bmpGoat;
+
+// Samples
+static SAMPLE* sJump;
+static SAMPLE* sRam;
+static SAMPLE* sHurt;
+static SAMPLE* sDie;
 
 
 // Update cloud
@@ -100,6 +107,8 @@ static void control_goat(GOAT* g) {
     if(g->canJump && vpad_get_button(0) == STATE_PRESSED) {
 
         g->speed.y = GOAT_JUMP;
+
+        play_sample(sJump, 0.5f);
     }
 
     // Limit jump height by releasing the button
@@ -111,6 +120,8 @@ static void control_goat(GOAT* g) {
 
     // Dash
     if(g->dashTimer <= 0.0f && vpad_get_button(1) == STATE_PRESSED) {
+
+        play_sample(sRam, 0.60f);
 
         g->dashing = true;
         if(g->canJump) {
@@ -213,7 +224,6 @@ static void animate_goat(GOAT* g, float tm) {
         if(fabs(g->speed.x) > DELTA) {
 
             int speed = 6 - (int)roundf(fabsf(g->speed.x) / 0.5f);
-
             spr_animate(&g->spr,0,0,7,speed, tm);
         }
         else {
@@ -325,6 +335,11 @@ void init_goat(ASSET_PACK* ass) {
 
     // Get assets
     bmpGoat = (BITMAP*)assets_get(ass, "goat");
+
+    sJump = (SAMPLE*)assets_get(ass, "jump");
+    sHurt = (SAMPLE*)assets_get(ass, "hurt");
+    sDie = (SAMPLE*)assets_get(ass, "die");
+    sRam = (SAMPLE*)assets_get(ass, "ram");
 }
 
 
@@ -405,6 +420,8 @@ void goat_update(GOAT* g, float tm) {
 
             status_reduce_health();
         }
+
+        play_sample(sDie, 0.70f);
     }
 }
 
@@ -477,6 +494,15 @@ void goat_hurt_collision(GOAT* g, float x, float y, float w, float h) {
 
         g->hurtTimer = HURT_TIME;
         status_reduce_health();
+
+        if(status_is_game_over()) {
+
+            play_sample(sDie, 0.70f);
+        }
+        else {
+
+            play_sample(sHurt, 0.60f);
+        }
     }
 }
 

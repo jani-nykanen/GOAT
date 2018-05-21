@@ -31,6 +31,11 @@ static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
 static BITMAP* bmpCursor;
 
+// Samples
+static SAMPLE* sAccept;
+static SAMPLE* sReject;
+static SAMPLE* sSelect;
+
 // Canvas copy
 static FRAME* canvasCopy;
 
@@ -87,24 +92,25 @@ static void draw_pause_text(int x, int y, int yoff) {
 static void menu_action() {
 
     bool audioState = music_enabled() && samples_enabled();
+    bool playSample = true;
 
     switch(cursorPos) {
 
     // Resume
     case 0:
         active = false;
-        return;
+        break;
 
     // Restart
     case 1:
         fade(1, 2.0f, game_reset);
         active = false;
-        return;
+        break;
 
     // Full screen
     case 2:
         core_toggle_fullscreen();
-        return;
+        break;
 
     // Audio
     case 3:
@@ -113,6 +119,8 @@ static void menu_action() {
 
             enable_music(false);
             enable_samples(false);
+
+            playSample = false;
         }
         else {
 
@@ -120,17 +128,22 @@ static void menu_action() {
             enable_samples(true);
         }
 
-        return;
+        break;
 
     // Quit
     case 4:
         fade(1,2.0f, core_terminate);
         active = false;
-        return;
+        break;
 
     default:
         break;
 
+    }
+
+    if(playSample) {
+
+        play_sample(sAccept, 0.80f);
     }
 
 }
@@ -143,6 +156,10 @@ int init_pause(ASSET_PACK* ass) {
     bmpFont = (BITMAP*)assets_get(ass, "font");
     bmpFont2 = (BITMAP*)assets_get(ass, "font2");
     bmpCursor = (BITMAP*)assets_get(ass, "cursor");
+
+    sAccept = (SAMPLE*)assets_get(ass, "accept");
+    sReject = (SAMPLE*)assets_get(ass, "reject");
+    sSelect = (SAMPLE*)assets_get(ass, "select");
 
     // Set defaults
     active = false;
@@ -199,6 +216,7 @@ void pause_update(float tm) {
     // If escape, unpause
     if(vpad_get_button(3) == STATE_PRESSED) {
 
+        play_sample(sReject, 0.70f);
         active = false;
         return;
     }
@@ -220,6 +238,8 @@ void pause_update(float tm) {
         moving = true;
         moveTimer = 0.0f;
         cursorDir = cursorPos > oldPos ? 1 : -1;
+
+        play_sample(sSelect, 0.70f);
     }
 }
 

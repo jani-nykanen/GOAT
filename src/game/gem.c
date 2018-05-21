@@ -8,6 +8,7 @@
 #include "camera.h"
 
 #include "../include/std.h"
+#include "../include/audio.h"
 
 // Constants
 static const float AMPLITUDE = 4.0f;
@@ -22,6 +23,10 @@ static const int HEART_PROB_MAX = 16;
 // Bitmaps
 static BITMAP* bmpGem;
 
+// Samples
+static SAMPLE* sGem;
+static SAMPLE* sHeal;
+
 // Heart probability
 static int heartProb;
 
@@ -31,6 +36,9 @@ void init_gems(ASSET_PACK* ass) {
 
     // Get bitmaps
     bmpGem = (BITMAP*)assets_get(ass, "gem");
+
+    sGem = (SAMPLE*)assets_get(ass, "sGem");
+    sHeal = (SAMPLE*)assets_get(ass, "heal");
 
     // Set heart probability to max
     heartProb = HEART_PROB_MAX;
@@ -216,6 +224,8 @@ void gem_goat_collision(GEM* gem, GOAT* g) {
 
           // Add gem to status
           (gem->isHeart ? status_add_health : status_add_coin) ();
+
+          play_sample(gem->isHeart ? sHeal : sGem, 0.65f);
     }
 }
 

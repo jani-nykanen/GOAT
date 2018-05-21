@@ -12,6 +12,7 @@
 
 #include "../leaderboard/menu.h"
 
+#include "../include/audio.h"
 #include "../include/renderer.h"
 #include "../include/std.h"
 
@@ -33,6 +34,11 @@ static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
 static BITMAP* bmpFontBig;
 static BITMAP* bmpCursor;
+
+// Samples
+static SAMPLE* sAccept;
+// static SAMPLE* sReject;
+static SAMPLE* sSelect;
 
 // Wave timer
 static float waveTimer;
@@ -127,6 +133,8 @@ static void menu_action() {
         break;
 
     }
+
+    play_sample(sAccept, 0.80f);
 }
 
 
@@ -139,6 +147,10 @@ void init_game_over(ASSET_PACK* ass) {
     bmpFont2 = (BITMAP*)assets_get(ass, "font2");
     bmpCursor = (BITMAP*)assets_get(ass, "cursor");
     bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
+
+    sAccept = (SAMPLE*)assets_get(ass, "accept");
+    // sReject = (SAMPLE*)assets_get(ass, "reject");
+    sSelect = (SAMPLE*)assets_get(ass, "select");
 
     // (Re)set stuff
     gover_reset();
@@ -200,6 +212,8 @@ void gover_update(float tm) {
         moving = true;
         moveTimer = 0.0f;
         cursorDir = cursorPos > oldPos ? 1 : -1;
+
+        play_sample(sSelect, 0.70f);
     }
 }
 

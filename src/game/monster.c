@@ -9,6 +9,7 @@
 #include "status.h"
 
 #include "../include/std.h"
+#include "../include/audio.h"
 
 // Constants
 static const float DEATH_MAX = 20.0f;
@@ -37,6 +38,9 @@ static const float FISH_TARGET = 2.5f;
 // Bitmaps
 static BITMAP* bmpMonsters;
 static BITMAP* bmpSplash;
+
+// Samples
+static SAMPLE* sHit;
 
 
 // "Set monster"
@@ -327,6 +331,8 @@ static void monster_die(MONSTER* m, bool stomped) {
     m->dying = true;
     m->stomped = stomped;
 
+    play_sample(sHit, 0.80f);
+
     // Add score
     status_add_score();
 }
@@ -338,6 +344,8 @@ void init_monsters(ASSET_PACK* ass) {
     // Get assets
     bmpMonsters = (BITMAP*)assets_get(ass, "monsters");
     bmpSplash = (BITMAP*)assets_get(ass, "splash");
+
+    sHit = (SAMPLE*)assets_get(ass, "hit");
 }
 
 
