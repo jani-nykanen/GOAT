@@ -64,7 +64,7 @@ static int game_init() {
     ASSET_PACK* ass = global_get_asset_pack();
 
     // Play music
-    fade_in_music((MUSIC*)assets_get(ass, "theme"), 0.50f, -1, 1000);
+    fade_in_music((MUSIC*)assets_get(ass, "theme"), 0.30f, -1, 1000);
 
     // Initialize components
     stage_init(ass);
@@ -217,7 +217,7 @@ static void game_destroy() {
 // Change
 static void game_on_change() {
 
-    game_reset();
+    // game_reset();
 }
 
 

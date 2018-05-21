@@ -242,3 +242,10 @@ bool status_is_game_over() {
 
     return isGameOver;
 }
+
+
+// Get score string
+void status_get_score_string(char* buf, int len) {
+
+    snprintf(buf, len, "SCORE: %d", (int)score);
+}

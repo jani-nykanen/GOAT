@@ -31,6 +31,7 @@ static const int ELEMENT_COUNT = 3;
 static BITMAP* bmpGameover;
 static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
+static BITMAP* bmpFontBig;
 static BITMAP* bmpCursor;
 
 // Wave timer
@@ -137,6 +138,7 @@ void init_game_over(ASSET_PACK* ass) {
     bmpFont = (BITMAP*)assets_get(ass, "font");
     bmpFont2 = (BITMAP*)assets_get(ass, "font2");
     bmpCursor = (BITMAP*)assets_get(ass, "cursor");
+    bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
 
     // (Re)set stuff
     gover_reset();
@@ -168,6 +170,9 @@ void gover_update(float tm) {
         cursorWave += CURSOR_WAVE_SPEED * tm;
     }
 
+    // Update text wave
+    waveTimer += WAVE_SPEED * tm;
+
     // Move
     if(moving) {
 
@@ -177,9 +182,6 @@ void gover_update(float tm) {
         else
             return;
     }
-
-    // Update text wave
-    waveTimer += WAVE_SPEED * tm;
 
     // Move cursor
     int oldPos = cursorPos;
@@ -206,18 +208,20 @@ void gover_update(float tm) {
 void gover_draw() {
 
     const int POS_X = 48;
-    const int POS_Y = 192-56;
+    const int POS_Y = 192-48;
     const int YOFF = 14;
+    const int BIG_TEXT_Y = 32;
+    const int SCORE_Y = 192-80;
 
     if(!status_is_game_over()) return;
 
     // Draw game over text
-    draw_game_over_text((256-240) / 2, 48);
+    draw_game_over_text((256-240) / 2, BIG_TEXT_Y);
 
     // Translate, if not ready yet
     if(goverTimer < GOVER_MAX) {
         
-        int p =  56 - (int)floorf(goverTimer / GOVER_MAX * 56.0f );
+        int p =  80 - (int)floorf(goverTimer / GOVER_MAX * 80.0f );
         translate(0, p);
     }
 
@@ -233,6 +237,11 @@ void gover_draw() {
 
     draw_bitmap(bmpCursor,POS_X-16 + (int)(sinf(cursorWave) * CURSOR_AMPLITUDE),
          cursorY, 0);
+
+    // Draw score
+    char scoreStr[16];
+    status_get_score_string(scoreStr, 16);
+    draw_text(bmpFontBig, scoreStr, 128, SCORE_Y, -16, 0, true);
 }
 
 

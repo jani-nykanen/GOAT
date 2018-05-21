@@ -468,7 +468,7 @@ void goat_hurt_collision(GOAT* g, float x, float y, float w, float h) {
     const float DIM_X = 8.0f;
     const float DIM_Y = 16.0f;
 
-    if(g->hurtTimer > 0.0f || g->dead) return;
+    if(g->hurtTimer > 0.0f || status_is_game_over()) return;
 
     // Check if inside the actual goat or those "off-screen entities"
     if(hurt(g->pos,DIM_X,DIM_Y,x,y,w,h)

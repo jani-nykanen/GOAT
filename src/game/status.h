@@ -34,4 +34,7 @@ void status_add_score();
 // Is the game over
 bool status_is_game_over();
 
+// Get score string
+void status_get_score_string(char* buf, int len);
+
 #endif // __STATUS__
