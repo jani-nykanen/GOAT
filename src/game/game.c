@@ -106,7 +106,8 @@ static void game_update(float tm) {
 
     // Check pause
     if(!status_is_game_over() 
-     && vpad_get_button(2) == STATE_PRESSED) {
+     && (vpad_get_button(2) == STATE_PRESSED
+     || vpad_get_button(3) == STATE_PRESSED) ) {
 
         pause_active();
         return;

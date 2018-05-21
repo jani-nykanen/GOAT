@@ -128,6 +128,45 @@ static void draw_error(int x, int y, int w, int h) {
 }
 
 
+// Draw results
+static void draw_results(int x, int y, int w, int h, int yoff) {
+
+    // Draw box
+    draw_box(x,y,w,h);
+
+    // Draw text
+    draw_text(bmpFont,"LEADERBOARD:",x+w/2,y+2,-7,0, true);
+
+    int i = 0;
+    // If current score in the list
+    int thisIndex = -1;
+    for(; i < MEMBER_MAX; ++ i) {
+
+        if(strcmp(lb.names[i],nameBuffer) == 0
+         && lb.scores[i] == (int)status_get_score()) {
+
+             thisIndex = i;
+             break;
+        }
+    }
+
+    
+    // Names
+    for(i=0; i < MEMBER_MAX; ++ i) {
+        
+        draw_text(i == thisIndex ? bmpFont2 : bmpFont,lb.names[i],x+8,y+16 + i*yoff,-7,0, false);
+    }
+
+    // Scores
+    char str[16];
+    for(i=0; i < MEMBER_MAX; ++ i) {
+        
+        snprintf(str, 16, "%d", lb.scores[i]);
+        draw_text(i == thisIndex ? bmpFont2 : bmpFont,str,x+8 + w/2,y+16 + i*yoff,-7,0, false);
+    }
+}
+
+
 // Get name input
 static void name_input(float tm) {
 
@@ -259,7 +298,8 @@ static int lb_menu_init() {
         return 1;
 
     // Initialize leaderboards
-    if(lb_init_http("https://game-leaderboards.000webhostapp.com") == 1) {
+    // https://game-leaderboards.000webhostapp.com
+    if(lb_init_http("http://localhost:8000") == 1) {
 
         return 1;
     }
@@ -332,6 +372,11 @@ static void lb_menu_draw() {
     const int SENDING_H = 16;
     const int ERROR_W = 192;
     const int ERROR_H = 64;
+    const int RESULT_W = 192;
+    const int RESULT_H = 152;
+    const int RESULT_YOFF = 13;
+
+    translate(0, 0);
 
     // Draw canvas copy
     draw_bitmap_fast(canvasCopy, 0, 0);
@@ -340,6 +385,7 @@ static void lb_menu_draw() {
     darken(darkCount);
 
     // Submit
+    // TODO: Stop being lazy and add switchzzzzzzz...
     if(mode == LB_MENU_SUBMIT) {
 
         draw_input_box(
@@ -367,6 +413,16 @@ static void lb_menu_draw() {
             ERROR_H 
         );
     }
+    else if(mode == LB_MENU_SHOW) {
+
+        draw_results(
+            128 - RESULT_W/2,
+            96 - RESULT_H/2,
+            RESULT_W,
+            RESULT_H ,
+            RESULT_YOFF
+        );
+    }
 }
 
 
@@ -376,7 +432,7 @@ static void lb_menu_on_change() {
     darkTimer = 0.0f;
     darkCount = 0;
     namePointer = 0;
-    nameBuffer[0] = '\0';
+    memset(nameBuffer,0,NAME_LENGTH);
     toBeSent = false;
 
     // Create a copy of the canvas

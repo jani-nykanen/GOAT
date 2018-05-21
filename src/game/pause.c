@@ -196,6 +196,13 @@ void pause_update(float tm) {
         return;
     }
 
+    // If escape, unpause
+    if(vpad_get_button(3) == STATE_PRESSED) {
+
+        active = false;
+        return;
+    }
+
     // Move cursor
     int oldPos = cursorPos;
     VEC2 stick = vpad_get_stick();

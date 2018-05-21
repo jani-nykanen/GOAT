@@ -219,9 +219,6 @@ int lb_add_score(LEADERBOARD* lb, const char* name, int score) {
         return 1;
     }
 
-    // Success message
-    printf("Score added successfully!\n");
-
     // Get leaderboards
     get_lb(lb, index);
 
