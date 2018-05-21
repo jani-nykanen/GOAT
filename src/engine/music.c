@@ -119,6 +119,13 @@ void enable_music(bool state) {
 }
 
 
+// Is music enabled
+bool music_enabled() {
+
+    return musicEnabled;
+}
+
+
 // Set global music volume
 void set_global_music_volume(int vol) {
 

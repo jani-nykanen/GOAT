@@ -37,4 +37,7 @@ bool status_is_game_over();
 // Get score string
 void status_get_score_string(char* buf, int len);
 
+// Get score
+unsigned int status_get_score();
+
 #endif // __STATUS__

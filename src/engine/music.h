@@ -40,6 +40,9 @@ void fade_out_music(int ms);
 // Set global music volume
 void enable_music(bool state);
 
+// Is music enabled
+bool music_enabled();
+
 // Set global music volume
 void set_global_music_volume(int vol);
 

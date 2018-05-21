@@ -11,7 +11,8 @@
 enum {
 
     LB_MENU_SHOW = 0,
-    LB_MENU_SUBMIT = 1
+    LB_MENU_SUBMIT = 1,
+    LB_MENU_SENDING = 2,
 };
 
 // Set menu type

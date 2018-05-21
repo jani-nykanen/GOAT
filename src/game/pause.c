@@ -66,8 +66,7 @@ static void draw_pause_box(int x, int y, int w, int h) {
 // Draw text
 static void draw_pause_text(int x, int y, int yoff) {
 
-    int audioState = get_global_music_volume() >= 10 
-        && samples_enabled();
+    bool audioState = music_enabled() && samples_enabled();
 
     const char* text;
 
@@ -87,8 +86,7 @@ static void draw_pause_text(int x, int y, int yoff) {
 // Menu action
 static void menu_action() {
 
-    int audioState = get_global_music_volume() >= 10 
-        && samples_enabled();
+    bool audioState = music_enabled() && samples_enabled();
 
     switch(cursorPos) {
 
@@ -113,12 +111,12 @@ static void menu_action() {
 
         if(audioState) {
 
-            set_global_music_volume(0);
+            enable_music(false);
             enable_samples(false);
         }
         else {
 
-            set_global_music_volume(100);
+            enable_music(true);
             enable_samples(true);
         }
 

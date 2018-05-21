@@ -249,3 +249,10 @@ void status_get_score_string(char* buf, int len) {
 
     snprintf(buf, len, "SCORE: %d", (int)score);
 }
+
+
+// Get score
+unsigned int status_get_score() {
+
+    return score;
+}
