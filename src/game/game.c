@@ -217,7 +217,7 @@ static void game_destroy() {
 // Change
 static void game_on_change() {
 
-
+    game_reset();
 }
 
 

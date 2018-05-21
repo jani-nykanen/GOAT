@@ -10,11 +10,13 @@
 #include "../global.h"
 
 #include "../include/renderer.h"
+#include "../include/audio.h"
 
 // Constants
 static const char* PAUSE_TEXT[] = {
-    "Resume", "Restart", "Full screen", "Audio", "Quit"
+    "Resume", "Restart", "Full screen", "Audio: On", "Quit"
 };
+static const char* AUDIO_TEXT_OFF = "Audio: Off";
 static const int PAUSE_BOX_W = 128;
 static const int PAUSE_BOX_H = 88;
 static const float CURSOR_AMPLITUDE = 2.0f;
@@ -22,6 +24,7 @@ static const float CURSOR_WAVE_SPEED = 0.1f;
 static const float MOVE_TIMER_MAX = 8.0f;
 static const float DARK_INTERVAL = 4.0f;
 static const int DARK_MAX = 4;
+static const int ELEMENT_COUNT = 5;
 
 // Bitmaps
 static BITMAP* bmpFont;
@@ -63,17 +66,29 @@ static void draw_pause_box(int x, int y, int w, int h) {
 // Draw text
 static void draw_pause_text(int x, int y, int yoff) {
 
+    int audioState = get_global_music_volume() >= 10 
+        && samples_enabled();
+
+    const char* text;
+
     int i = 0;
-    for(; i < 5; ++ i) {
+    for(; i < ELEMENT_COUNT; ++ i) {
+
+        text = PAUSE_TEXT[i];
+        if(i == 3 && !audioState)
+            text = AUDIO_TEXT_OFF;
 
         draw_text( (moving || (cursorPos != i)) ? bmpFont : bmpFont2, 
-            PAUSE_TEXT[i],x,y +yoff*i,-7,0,false);
+            text,x,y +yoff*i,-7,0,false);
     }
 }
 
 
 // Menu action
 static void menu_action() {
+
+    int audioState = get_global_music_volume() >= 10 
+        && samples_enabled();
 
     switch(cursorPos) {
 
@@ -91,6 +106,22 @@ static void menu_action() {
     // Full screen
     case 2:
         core_toggle_fullscreen();
+        return;
+
+    // Audio
+    case 3:
+
+        if(audioState) {
+
+            set_global_music_volume(0);
+            enable_samples(false);
+        }
+        else {
+
+            set_global_music_volume(100);
+            enable_samples(true);
+        }
+
         return;
 
     // Quit
@@ -172,7 +203,7 @@ void pause_update(float tm) {
     VEC2 stick = vpad_get_stick();
 
     // Limit
-    if(cursorPos < 4 && stick.y > DELTA)
+    if(cursorPos < ELEMENT_COUNT-1 && stick.y > DELTA)
         ++ cursorPos;
 
     else if(cursorPos > 0 && stick.y < -DELTA)

@@ -43,4 +43,7 @@ void enable_samples(bool state);
 // Get global sample volume
 int get_global_sample_volume();
 
+// Are samples enabled
+bool samples_enabled();
+
 #endif // __SAMPLE__

@@ -113,3 +113,10 @@ int get_global_sample_volume() {
 
     return globalSoundVol;
 }
+
+
+// Are samples enabled
+bool samples_enabled() {
+
+    return samplesEnabled;
+}
