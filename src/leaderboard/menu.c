@@ -1,5 +1,5 @@
 // GOAT
-// Leaderboard menu scene (header)
+// Leaderboard menu scene (source)
 // (c) 2018 Jani Nykänen
 
 #include "menu.h"
@@ -437,6 +437,13 @@ static void lb_menu_draw() {
 }
 
 
+// Destroy
+static void lb_menu_destroy() {
+
+    frame_destroy(canvasCopy);
+}
+
+
 // Swap
 static void lb_menu_on_change() {
 
@@ -462,6 +469,6 @@ void set_lb_menu_type(int type) {
 SCENE lb_menu_get_scene() {
 
     return scene_create(
-        lb_menu_init,lb_menu_update,lb_menu_draw,NULL,lb_menu_on_change,
+        lb_menu_init,lb_menu_update,lb_menu_draw,lb_menu_destroy,lb_menu_on_change,
         "lbmenu");
 }

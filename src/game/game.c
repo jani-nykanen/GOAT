@@ -67,9 +67,6 @@ static int game_init() {
     ASSET_PACK* ass = global_get_asset_pack();
     sPause = (SAMPLE*)assets_get(ass, "pause");
 
-    // Play music
-    fade_in_music((MUSIC*)assets_get(ass, "theme"), 0.40f, -1, 1000);
-
     // Initialize components
     stage_init(ass);
     init_goat(ass);
@@ -217,6 +214,7 @@ static void game_draw() {
 // Destroy
 static void game_destroy() {
 
+    pause_destroy();
 }
 
 

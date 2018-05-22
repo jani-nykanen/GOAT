@@ -59,6 +59,13 @@ static int darkCount;
 static bool active;
 
 
+// Change to title
+static void change_to_title() {
+
+    core_swap_scene("title");
+}
+
+
 // Draw pause box
 static void draw_pause_box(int x, int y, int w, int h) {
 
@@ -132,7 +139,7 @@ static void menu_action() {
 
     // Quit
     case 4:
-        fade(1,2.0f, core_terminate);
+        fade(1,2.0f, change_to_title);
         active = false;
         break;
 
@@ -298,4 +305,11 @@ void pause_active() {
 
     // Create a copy of the canvas
     frame_copy(get_global_frame(), canvasCopy);
+}
+
+
+// Destroy pause
+void pause_destroy() {
+
+    frame_destroy(canvasCopy);
 }

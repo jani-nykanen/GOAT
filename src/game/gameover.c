@@ -57,6 +57,13 @@ static bool moving;
 static int cursorDir;
 
 
+// Change to title
+static void change_to_title() {
+
+    core_swap_scene("title");
+}
+
+
 // Draw menu text
 static void draw_menu_text(int x, int y, int yoff) {
 
@@ -126,7 +133,7 @@ static void menu_action() {
 
     // Return
     case 2:
-        fade(1, 2.0f, core_terminate);
+        fade(1, 2.0f, change_to_title);
         break;
 
     default:

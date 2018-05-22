@@ -9,6 +9,7 @@
 // Scenes
 #include "game/game.h"
 #include "leaderboard/menu.h"
+#include "title/title.h"
 #include "global.h"
 
 
@@ -19,6 +20,7 @@ int main(int argc, char** argv) {
     core_add_scene(global_get_scene());
     core_add_scene(lb_menu_get_scene());
     core_add_scene(game_get_scene());
+    core_add_scene(ts_get_scene());
     
     return core_run_application("properties.conf");
 }

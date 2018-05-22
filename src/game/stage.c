@@ -512,6 +512,7 @@ int stage_init(ASSET_PACK* ass) {
     // Set seed
     srand(time(NULL));
 
+    cloudPos = 0.0f;
     // Reset
     stage_reset();
 
@@ -545,9 +546,15 @@ void stage_update(float globalSpeed, float tm) {
 }
 
 
-// Player collision
-void stage_pl_collision(void* pl, float tm) {
+// Update stage (bg only)
+void stage_update_bg_only(float tm) {
 
+    // Make the clouds move again
+    cloudPos -= CLOUD_SPEED * tm;
+    if(cloudPos <= -(float)bmpClouds->width) {
+
+        cloudPos += (int)bmpClouds->width;
+    }
 }
 
 
@@ -603,7 +610,6 @@ void stage_gem_collision(GEM* g) {
 void stage_reset() {
 
     // Set default values
-    cloudPos = 0.0f;
     platTimer = 0.0f;
 
     int i = 0;

@@ -23,4 +23,7 @@ bool pause_is_active();
 // Active pause
 void pause_active();
 
+// Destroy pause
+void pause_destroy();
+
 #endif // __PAUSE__

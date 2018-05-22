@@ -9,6 +9,7 @@
 #include "include/std.h"
 #include "include/renderer.h"
 #include "include/system.h"
+#include "include/audio.h"
 
 // Constants
 static float FADE_MAX = 60.0f;
@@ -47,6 +48,9 @@ static int global_init() {
 
         return 1;   
     }
+
+    // Play music
+    fade_in_music((MUSIC*)assets_get(globalAssets, "theme"), 0.50f, -1, 1000);
 
     // Initialize virtual gamepad
     vpad_init();

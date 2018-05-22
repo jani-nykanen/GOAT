@@ -16,9 +16,8 @@ int stage_init(ASSET_PACK* ass);
 // Update stage
 void stage_update(float globalSpeed, float tm);
 
-// Player collision
-// TODO: void* => PLAYER*
-void stage_pl_collision(void* pl, float tm);
+// Update stage (bg only)
+void stage_update_bg_only(float tm);
 
 // Draw stage
 void stage_draw();
