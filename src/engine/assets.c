@@ -101,7 +101,7 @@ ASSET_PACK* load_asset_pack(const char* fpath) {
     p->assetCount = 0;
 
     
-    int assetType;       
+    int assetType =0;       
 
     int count = 0;
     
@@ -147,6 +147,7 @@ ASSET_PACK* load_asset_pack(const char* fpath) {
 
                     return NULL;
                 }
+                p->types[p->assetCount] = assetType;
                 strcpy(p->names[p->assetCount].data, name);
                 ++ p->assetCount;
             }
@@ -191,10 +192,11 @@ void assets_destroy(ASSET_PACK* p) {
     for(; i < p->assetCount; ++ i) {   
 
         obj = p->objects[i];
+
         switch(p->types[i])
         {
         case T_BITMAP:
-            bitmap_destroy((BITMAP*)obj);
+            bitmap_destroy((_BITMAP*)obj);
             break;
         case T_TILEMAP:
             destroy_tilemap((TILEMAP*)obj);

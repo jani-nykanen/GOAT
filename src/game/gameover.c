@@ -27,10 +27,10 @@ static const char* GOVER_TEXT[] = {
 static const int ELEMENT_COUNT = 3;
 
 // Bitmaps
-static BITMAP* bmpGameover;
-static BITMAP* bmpFont;
-static BITMAP* bmpFont2;
-static BITMAP* bmpFontBig;
+static _BITMAP* bmpGameover;
+static _BITMAP* bmpFont;
+static _BITMAP* bmpFont2;
+static _BITMAP* bmpFontBig;
 
 // Samples
 static SAMPLE* sAccept;
@@ -91,11 +91,11 @@ static void draw_game_over_text(int dx, int dy) {
         if(goverTimer < GOVER_MAX) {
 
             int fade = 1 + (int)floorf( goverTimer / GOVER_MAX * 16.0f );
-            draw_bitmap_region_fading(bmpGameover, c*29, 0,29,64, x, y, 0, fade, get_alpha());
+            draw__BITMAP_region_fading(bmpGameover, c*29, 0,29,64, x, y, 0, fade, get_alpha());
 
         }
         else
-            draw_bitmap_region(bmpGameover, c*29, 0,29,64, x, y, 0);
+            draw__BITMAP_region(bmpGameover, c*29, 0,29,64, x, y, 0);
 
         x += XOFF;
         ++ c;
@@ -137,11 +137,11 @@ static void menu_action() {
 // Initialize
 void init_game_over(ASSET_PACK* ass) {
 
-    // Get bitmaps
-    bmpGameover = (BITMAP*)assets_get(ass, "gameOver");
-    bmpFont = (BITMAP*)assets_get(ass, "font");
-    bmpFont2 = (BITMAP*)assets_get(ass, "font2");
-    bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
+    // Get Bitmaps
+    bmpGameover = (_BITMAP*)assets_get(ass, "gameOver");
+    bmpFont = (_BITMAP*)assets_get(ass, "font");
+    bmpFont2 = (_BITMAP*)assets_get(ass, "font2");
+    bmpFontBig = (_BITMAP*)assets_get(ass, "fontBig");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sSelect = (SAMPLE*)assets_get(ass, "select");

@@ -36,8 +36,8 @@ static const float FISH_ACC = 0.05f;
 static const float FISH_TARGET = 2.5f;
 
 // Bitmaps
-static BITMAP* bmpMonsters;
-static BITMAP* bmpSplash;
+static _BITMAP* bmpMonsters;
+static _BITMAP* bmpSplash;
 
 // Samples
 static SAMPLE* sHit;
@@ -308,7 +308,7 @@ static void animate_monster(MONSTER* m, float tm) {
 // Draw fading
 static void draw_fading(int sx, int sy, int x, int y, int fade, int flip) {
 
-    draw_bitmap_region_fading(bmpMonsters,sx,sy,
+    draw__BITMAP_region_fading(bmpMonsters,sx,sy,
                 32,32,x,y, flip, fade, get_alpha());
 }
 
@@ -342,8 +342,8 @@ static void monster_die(MONSTER* m, bool stomped) {
 void init_monsters(ASSET_PACK* ass) {
 
     // Get assets
-    bmpMonsters = (BITMAP*)assets_get(ass, "monsters");
-    bmpSplash = (BITMAP*)assets_get(ass, "splash");
+    bmpMonsters = (_BITMAP*)assets_get(ass, "monsters");
+    bmpSplash = (_BITMAP*)assets_get(ass, "splash");
 
     sHit = (SAMPLE*)assets_get(ass, "hit");
 }

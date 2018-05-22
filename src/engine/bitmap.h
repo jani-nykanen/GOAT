@@ -8,15 +8,15 @@
 #include "frame.h"
 
 // Bitmap type
-typedef FRAME BITMAP;
+typedef FRAME _BITMAP;
 
 // Load a bitmap
-BITMAP* bitmap_load(const char* path);
+_BITMAP* bitmap_load(const char* path);
 
 // Destroy bitmap
 #define bitmap_destroy(b) frame_destroy((FRAME*)b)
 
 // Create a bitmap
-#define bitmap_create(w, h) (BITMAP*)frame_create(w, h)
+#define bitmap_create(w, h) (_BITMAP*)frame_create(w, h)
 
 #endif // __BITMAP__

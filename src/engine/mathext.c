@@ -67,15 +67,15 @@ float max_2f(float a, float b) {
 
 
 // Order three points, compare y axis
-void order_points_y_3(POINT* a, POINT* b, POINT* c) {
+void order_points_y_3(_POINT* a, _POINT* b, _POINT* c) {
 
-    POINT p[3];
+    _POINT p[3];
     p[0] = *a;
     p[1] = *b;
     p[2] = *c;
     int i = 0;
 
-    POINT buf;
+    _POINT buf;
     bool changed = false;
     do {
 

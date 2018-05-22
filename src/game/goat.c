@@ -27,7 +27,7 @@ static const float DASH_JUMP = -1.75f;
 static const float DEATH_TIMER_MAX = 60.0f;
 
 // Bitmaps
-static BITMAP* bmpGoat;
+static _BITMAP* bmpGoat;
 
 // Samples
 static SAMPLE* sJump;
@@ -250,7 +250,7 @@ static void draw_cloud_sprite(CLOUD* c, int x, int y) {
 
     int fade = 13- (int)floor(c->timer / CLOUD_LIMIT * 12);
 
-    draw_bitmap_region_fading(bmpGoat,
+    draw__BITMAP_region_fading(bmpGoat,
         c->frame*32,c->row*32, 32,32, x,y,c->flip,fade, 255);
 }
 
@@ -293,7 +293,7 @@ static void draw_single_goat(GOAT* g, int x, int y) {
         if(!g->dead) {
 
             int fade = 1 + (int)floor(g->deathTimer / DEATH_TIMER_MAX * 10.0f);
-            draw_bitmap_region_fading(
+            draw__BITMAP_region_fading(
                 bmpGoat,
                 g->spr.frame * g->spr.w,
                 g->spr.row * g->spr.h,
@@ -318,7 +318,7 @@ static void draw_single_goat(GOAT* g, int x, int y) {
         int sw = g->spr.w;
         int sh = g->spr.h;
 
-        draw_bitmap_region_fading(bmpGoat,sx,sy,sw,sh,x,y, g->flip,2,get_alpha());
+        draw__BITMAP_region_fading(bmpGoat,sx,sy,sw,sh,x,y, g->flip,2,get_alpha());
     }
 }
 
@@ -334,7 +334,7 @@ static bool hurt(VEC2 p, float dimx, float dimy, float x, float y, float w, floa
 void init_goat(ASSET_PACK* ass) {
 
     // Get assets
-    bmpGoat = (BITMAP*)assets_get(ass, "goat");
+    bmpGoat = (_BITMAP*)assets_get(ass, "goat");
 
     sJump = (SAMPLE*)assets_get(ass, "jump");
     sHurt = (SAMPLE*)assets_get(ass, "hurt");

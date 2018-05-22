@@ -16,7 +16,7 @@ void core_add_scene(SCENE s);
 int core_run_application(const char* configPath);
 
 // Get window size
-POINT core_window_size();
+_POINT core_window_size();
 
 // Toggle full screen
 void core_toggle_fullscreen();

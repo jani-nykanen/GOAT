@@ -25,45 +25,45 @@ static SDL_Texture* texCanvas =NULL;
 static Uint8 alpha = 170;
 
 // Translation
-static POINT tr;
+static _POINT tr;
 
 // Darkness palette
 static Uint8 dpalette[DARKNESS_PALATTE_SIZE] [256];
 
 // Used texture
-static BITMAP* gtex;
+static _BITMAP* gtex;
 // UV coordinates
 static VEC2 uv1, uv2, uv3;
 // UV translation
 static VEC2 UVtrans;
 // Matrix that is used for texturing
-static MAT2INT texMat;
+static MATRIX2INT texMat;
 
 
 // Generate texturing matrix
 static void gen_matrix(int x1, int y1, int x2, int y2, int x3, int y3)
 {
-    BITMAP* b = gtex;
+    _BITMAP* b = gtex;
 
     // UV matrix
-    MAT2 uv = mat2(
+    MATRIX2 uv = MATRIX2(
         (uv3.x-uv1.x), (uv2.x-uv1.x),
         (uv3.y-uv1.y), (uv2.y-uv1.y)
     );
-    MAT2 uvInv = mat2_inverse(uv);
+    MATRIX2 uvInv = MATRIX2_inverse(uv);
 
     // U ja V vectors
     VEC2 u = vec2((x3-x1),(y3-y1));
     VEC2 v = vec2((x2-x1),(y2-y1));
 
     // Basis
-    MAT2 basis = mat2(
+    MATRIX2 basis = MATRIX2(
         u.x, v.x,
         u.y, v.y
     );
 
     // Scale
-    MAT2 scale = mat2(
+    MATRIX2 scale = MATRIX2(
         1.0f/b->width,0.0f,
         0.0f, 1.0/b->height
     );
@@ -71,13 +71,13 @@ static void gen_matrix(int x1, int y1, int x2, int y2, int x3, int y3)
     UVtrans = vec2(uv1.x * b->width, uv1.y * b->height);
 
     // Final matrix
-    MAT2 m = mat2_mul(basis,uvInv);
-    m = mat2_mul(scale,m);
+    MATRIX2 m = MATRIX2_mul(basis,uvInv);
+    m = MATRIX2_mul(scale,m);
 
     // Inverse matrix
-    MAT2 temp = mat2_inverse(m);
+    MATRIX2 temp = MATRIX2_inverse(m);
 
-    texMat = mat2int((int)(temp.m11*1000),(int)(temp.m21*1000),(int)(temp.m12*1000),(int)(temp.m22*1000) );
+    texMat = MATRIX2int((int)(temp.m11*1000),(int)(temp.m21*1000),(int)(temp.m12*1000),(int)(temp.m22*1000) );
 }
 
 
@@ -97,7 +97,7 @@ static Uint8 get_tex_color(int x, int y, int x1, int y1) {
     tx += UVtrans.x;
     ty += UVtrans.y;
 
-    // Limit the coordinates inside the bitmap
+    // Limit the coordinates inside the _BITMAP
     tx = tx % gtex->width;
     ty = ty % gtex->height;
 
@@ -171,8 +171,8 @@ static Uint8 get_color_dark(int dvalue, int x, int y, Uint8 col) {
 }
 
 
-// Clip bitmap
-static bool clip(BITMAP* bmp, int* dx, int* dy, int* sx, int* sy, int* sw, int* sh, int flip) {
+// Clip _BITMAP
+static bool clip(_BITMAP* bmp, int* dx, int* dy, int* sx, int* sy, int* sw, int* sh, int flip) {
 
     // Clip
     int ow;
@@ -284,7 +284,7 @@ void update_canvas_texture() {
 
 
 // Draw canvas texture
-void draw_canvas_texture(POINT pos, POINT size) {
+void draw_canvas_texture(_POINT pos, _POINT size) {
 
     // Draw canvas texture
     SDL_Rect dest = (SDL_Rect){pos.x,pos.y,size.x,size.y};
@@ -333,15 +333,15 @@ void fill_rect(int x, int y, int w, int h, Uint8 color) {
 }
 
 
-// Draw a bitmap
-void draw_bitmap(BITMAP* bmp, int dx, int dy, int flip) {
+// Draw a _BITMAP
+void draw__BITMAP(_BITMAP* bmp, int dx, int dy, int flip) {
 
-    draw_bitmap_region(bmp,0,0,bmp->width,bmp->height,dx,dy,flip);
+    draw__BITMAP_region(bmp,0,0,bmp->width,bmp->height,dx,dy,flip);
 }
 
 
-// Draw a bitmap region
-void draw_bitmap_region(BITMAP* bmp, int sx, int sy, int sw, int sh, 
+// Draw a _BITMAP region
+void draw__BITMAP_region(_BITMAP* bmp, int sx, int sy, int sw, int sh, 
     int dx, int dy, int flip) {
 
     if(bmp == NULL) return;
@@ -412,10 +412,10 @@ void draw_bitmap_region(BITMAP* bmp, int sx, int sy, int sw, int sh,
 }
 
 
-// Draw a "fading" bitmap
+// Draw a "fading" _BITMAP
 // (For performance reasons I don't add one "super method" for
 //  both this and normal region drawing)
-void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh, 
+void draw__BITMAP_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh, 
         int dx, int dy, int flip, 
         int fade, Uint8 color) {
 
@@ -494,14 +494,14 @@ void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh,
 
 
 // Faster rendering routine (no alpha or flipping)
-void draw_bitmap_fast(BITMAP* bmp, int dx, int dy) {
+void draw__BITMAP_fast(_BITMAP* bmp, int dx, int dy) {
 
-    draw_bitmap_region_fast(bmp,0,0,bmp->width, bmp->height, dx, dy);
+    draw__BITMAP_region_fast(bmp,0,0,bmp->width, bmp->height, dx, dy);
 }
 
 
-// Faster routine for drawing a bitmap region (no alpha or flipping)
-void draw_bitmap_region_fast(BITMAP* bmp, 
+// Faster routine for drawing a _BITMAP region (no alpha or flipping)
+void draw__BITMAP_region_fast(_BITMAP* bmp, 
     int sx, int sy, int sw, int sh, int dx, int dy) {
 
     if(bmp == NULL) return;
@@ -527,8 +527,8 @@ void draw_bitmap_region_fast(BITMAP* bmp,
 }
 
 
-// Draw text with a bitmap font
-void draw_text(BITMAP* font, const char* text, 
+// Draw text with a _BITMAP font
+void draw_text(_BITMAP* font, const char* text, 
     int dx, int dy, int xoff, int yoff, bool center) {
 
     int len = strlen((const char*)text);
@@ -561,7 +561,7 @@ void draw_text(BITMAP* font, const char* text,
         sx = c % 16;
         sy = c / 16;
 
-        draw_bitmap_region(font,sx*cw,sy*ch,cw,ch,x,y, FLIP_NONE);
+        draw__BITMAP_region(font,sx*cw,sy*ch,cw,ch,x,y, FLIP_NONE);
 
         x += cw + xoff;
     }
@@ -613,9 +613,9 @@ void draw_inverse_triangle(int x1, int y1, int x2, int y2, int x3, int y3) {
     y3 += tr.y;
 
     // Set points
-    POINT min = point(x1, y1);
-    POINT mid = point(x2, y2);
-    POINT max = point(x3, y3);
+    _POINT min = point(x1, y1);
+    _POINT mid = point(x2, y2);
+    _POINT max = point(x3, y3);
     order_points_y_3(&min, &mid, &max);
 
     // If not in the screen, do not draw
@@ -725,9 +725,9 @@ void draw_triangle(int x1, int y1, int x2, int y2, int x3, int y3, Uint8 color) 
     // TODO: Check if the points are NOT in the same line
 
     // Set points
-    POINT min = point(x1, y1);
-    POINT mid = point(x2, y2);
-    POINT max = point(x3, y3);
+    _POINT min = point(x1, y1);
+    _POINT mid = point(x2, y2);
+    _POINT max = point(x3, y3);
     order_points_y_3(&min, &mid, &max);
 
     // If not in the screen, do not draw
@@ -795,7 +795,7 @@ void translate(int x, int y) {
 
 
 // Set the render target
-void set_render_target(BITMAP* target) {
+void set_render_target(_BITMAP* target) {
 
     if(target == NULL) {
 
@@ -849,7 +849,7 @@ void set_uv_coords(float u1, float v1, float u2, float v2, float u3, float v3) {
 
 
 // Bind a texture
-void bind_texture(BITMAP* tex) {
+void bind_texture(_BITMAP* tex) {
 
     gtex = tex;
 }

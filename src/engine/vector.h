@@ -24,7 +24,7 @@ typedef struct {
 
     int x,y;
 }
-POINT;
+_POINT;
 
 // 2x2 matrix
 typedef struct {
@@ -32,7 +32,7 @@ typedef struct {
     float m11, m21;
     float m12, m22;
 }
-MAT2;
+MATRIX2;
 
 // 2x2 matrix (integer)
 typedef struct {
@@ -40,13 +40,13 @@ typedef struct {
     int m11, m21;
     int m12, m22;
 }
-MAT2INT;
+MATRIX2INT;
 
 // Create a 2x2 matrix
-#define mat2(b11,b21,b12,b22) (MAT2){b11,b21,b12,b22}
+#define MATRIX2(b11,b21,b12,b22) (MATRIX2){b11,b21,b12,b22}
 
 // Create a 2x2 matrix (integer)
-#define mat2int(b11,b21,b12,b22) (MAT2INT){b11,b21,b12,b22}
+#define MATRIX2int(b11,b21,b12,b22) (MATRIX2INT){b11,b21,b12,b22}
 
 // Vector 2 constructor
 VEC2 vec2(float x, float y);
@@ -55,27 +55,27 @@ VEC2 vec2(float x, float y);
 VEC3 vec3(float x, float y, float z);
 
 // Point constructor
-POINT point(int x, int y);
+_POINT point(int x, int y);
 
 // Addition for vector
 VEC2 vec2_add(VEC2 a, VEC2 b);
 
 // Addition for point
-POINT point_add(POINT a, POINT b);
+_POINT point_add(_POINT a, _POINT b);
 
 // Calculate determinant
-float mat2_det(MAT2 m);
+float MATRIX2_det(MATRIX2 m);
 
 // Inverse matrix
-MAT2 mat2_inverse(MAT2 m);
+MATRIX2 MATRIX2_inverse(MATRIX2 m);
 
 // Matrix multiplication
-MAT2 mat2_mul(MAT2 a, MAT2 b);
+MATRIX2 MATRIX2_mul(MATRIX2 a, MATRIX2 b);
 
 // Multiply matrix with a vector
-VEC2 mat2_mul_vec2(MAT2 m, VEC2 v);
+VEC2 MATRIX2_mul_vec2(MATRIX2 m, VEC2 v);
 
 // Float to int, matrices
-MAT2INT mat2_to_int(MAT2 m);
+MATRIX2INT MATRIX2_to_int(MATRIX2 m);
 
 #endif // __VECTOR__

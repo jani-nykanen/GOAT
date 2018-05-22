@@ -45,28 +45,28 @@ int create_canvas_texture(FRAME* f);
 void update_canvas_texture();
 
 // Draw canvas texture
-void draw_canvas_texture(POINT pos, POINT size);
+void draw_canvas_texture(_POINT pos, _POINT size);
 
 // Fill rectangle
 void fill_rect(int x, int y, int w, int h, Uint8 color);
 
-// Draw a bitmap
-void draw_bitmap(BITMAP* bmp, int x, int y, int flip);
+// Draw a _BITMAP
+void draw__BITMAP(_BITMAP* bmp, int x, int y, int flip);
 
-// Draw a bitmap region
-void draw_bitmap_region(BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip);
+// Draw a _BITMAP region
+void draw__BITMAP_region(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip);
 
-// Draw a "fading" bitmap
-void draw_bitmap_region_fading(BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip, int fade, Uint8 color);
+// Draw a "fading" _BITMAP
+void draw__BITMAP_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip, int fade, Uint8 color);
 
-// Faster routine for drawing a bitmap (no alpha or flipping)
-void draw_bitmap_fast(BITMAP* bmp, int x, int y);
+// Faster routine for drawing a _BITMAP (no alpha or flipping)
+void draw__BITMAP_fast(_BITMAP* bmp, int x, int y);
 
-// Faster routine for drawing a bitmap region (no alpha or flipping)
-void draw_bitmap_region_fast(BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy);
+// Faster routine for drawing a _BITMAP region (no alpha or flipping)
+void draw__BITMAP_region_fast(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy);
 
-// Draw text with a bitmap font
-void draw_text(BITMAP* font, const char* text, int x, int y, int xoff, int yoff, bool center);
+// Draw text with a _BITMAP font
+void draw_text(_BITMAP* font, const char* text, int x, int y, int xoff, int yoff, bool center);
 
 // Draw a triangle
 void draw_inverse_triangle(int x1, int y1, int x2, int y2, int x3, int y3);
@@ -84,7 +84,7 @@ FRAME* get_global_frame();
 void translate(int x, int y);
 
 // Set the render target
-void set_render_target(BITMAP* target);
+void set_render_target(_BITMAP* target);
 
 // Darken the whole screen
 void darken(int d);
@@ -93,6 +93,6 @@ void darken(int d);
 void set_uv_coords(float u1, float v1, float u2, float v2, float u3, float v3);
 
 // Bind a texture
-void bind_texture(BITMAP* tex);
+void bind_texture(_BITMAP* tex);
 
 #endif // __GRAPHICS__

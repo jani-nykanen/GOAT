@@ -30,10 +30,11 @@ static const float GO_AWAY_MAX = 60.0f;
 static const int ELEMENT_COUNT = 5;
 
 // Bitmaps
-static BITMAP* bmpFont;
-static BITMAP* bmpFont2;
-static BITMAP* bmpFontBig;
-static BITMAP* bmpLogo;
+static _BITMAP* bmpFont;
+static _BITMAP* bmpFont2;
+static _BITMAP* bmpFontBig;
+static _BITMAP* bmpLogo;
+static _BITMAP* bmpControls;
 
 // Samples
 static SAMPLE* sAccept;
@@ -69,7 +70,7 @@ static void draw_logo(int dx, int dy) {
 
         y = dy + (int)floorf(sinf(logoWave + PERIOD*i) * LOGO_AMPLITUDE);
 
-        draw_bitmap_region(bmpLogo, i*w,0,w,bmpLogo->height, dx + w*i, y, 0);
+        draw__BITMAP_region(bmpLogo, i*w,0,w,bmpLogo->height, dx + w*i, y, 0);
     }
 
 }
@@ -101,7 +102,7 @@ static void draw_press_enter(int dx, int dy, int xoff) {
 
     const float PERIOD = M_PI / 10;
     const char* TEXT = "PRESS ENTER";
-    char str[1];
+    char str[2];
 
     int i = 0;
     int y;
@@ -112,6 +113,7 @@ static void draw_press_enter(int dx, int dy, int xoff) {
         y = dy + (int)floorf(sinf(logoWave + PERIOD*i) * ENTER_AMPLITUDE);
 
         str[0] = TEXT[i];
+        str[1] = 0;
         draw_text(bmpFontBig,(const char*)str, dx + i* (-xoff), y, xoff,0,false);
     }
 }
@@ -185,10 +187,11 @@ static int ts_init() {
     // Get assets
     ASSET_PACK* ass = global_get_asset_pack();
     
-    bmpFont = (BITMAP*)assets_get(ass, "font");
-    bmpFont2 = (BITMAP*)assets_get(ass, "font2"); 
-    bmpLogo = (BITMAP*)assets_get(ass, "logo"); 
-    bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
+    bmpFont = (_BITMAP*)assets_get(ass, "font");
+    bmpFont2 = (_BITMAP*)assets_get(ass, "font2"); 
+    bmpLogo = (_BITMAP*)assets_get(ass, "logo"); 
+    bmpFontBig = (_BITMAP*)assets_get(ass, "fontBig");
+    bmpControls = (_BITMAP*)assets_get(ass, "controls");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sReject = (SAMPLE*)assets_get(ass, "reject");
@@ -295,6 +298,10 @@ static void ts_draw() {
 
     // Translate
     if(goingAway) {
+
+        // Draw controls
+        int x = -72 + (int)floorf(goAway/GO_AWAY_MAX * 72.0f);
+        draw__BITMAP(bmpControls, x, 0, 0);
 
         y = (int)floorf(goAway / GO_AWAY_MAX * 96.0f);
         translate(0, y);

@@ -9,6 +9,7 @@
 #define NAME_STRING_SIZE 128
 
 // Initial buffer size
+// TODO: Reallocation?
 #define INITIAL_BUFFER_SIZE 512
 
 // Literally any type
@@ -24,7 +25,7 @@ NAME;
 // Asset pack type
 typedef struct {
 
-    int* types;
+    int types[INITIAL_BUFFER_SIZE];
     ANY objects[INITIAL_BUFFER_SIZE];
     NAME names[INITIAL_BUFFER_SIZE];
     unsigned int assetCount;

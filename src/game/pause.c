@@ -25,8 +25,8 @@ static const int DARK_MAX = 4;
 static const int ELEMENT_COUNT = 5;
 
 // Bitmaps
-static BITMAP* bmpFont;
-static BITMAP* bmpFont2;
+static _BITMAP* bmpFont;
+static _BITMAP* bmpFont2;
 
 // Samples
 static SAMPLE* sAccept;
@@ -148,9 +148,9 @@ static void menu_action() {
 // Initialize
 int init_pause(ASSET_PACK* ass) {
 
-    // Get bitmaps
-    bmpFont = (BITMAP*)assets_get(ass, "font");
-    bmpFont2 = (BITMAP*)assets_get(ass, "font2");
+    // Get Bitmaps
+    bmpFont = (_BITMAP*)assets_get(ass, "font");
+    bmpFont2 = (_BITMAP*)assets_get(ass, "font2");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sReject = (SAMPLE*)assets_get(ass, "reject");
@@ -214,7 +214,7 @@ void pause_draw() {
     const int POS_Y = 96-PAUSE_BOX_H/2 + 8; 
 
     // Draw canvas copy
-    draw_bitmap_fast((BITMAP*)canvasCopy,0,0);
+    draw__BITMAP_fast((_BITMAP*)canvasCopy,0,0);
 
     // Darken
     darken(darkCount);

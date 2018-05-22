@@ -85,6 +85,14 @@ int config_read(CONFIG* c, const char* path) {
 
                 strcpy(c->keyconfPath, value);
             }
+            else if(strcmp(key,"$music_volume") == 0) {
+
+                c->musicVol = (int)strtol(value,NULL,10);
+            }
+            else if(strcmp(key,"$sample_volume") == 0) {
+
+                c->sampleVol = (int)strtol(value,NULL,10);
+            }
 
         }
         // Store the current value to the key

@@ -20,9 +20,9 @@ VEC3 vec3(float x, float y, float z) {
 
 
 // Point constructor
-POINT point(int x, int y) {
+_POINT point(int x, int y) {
 
-    return (POINT){x,y};
+    return (_POINT){x,y};
 }
 
 
@@ -34,24 +34,24 @@ VEC2 vec2_add(VEC2 a, VEC2 b) {
 
 
 // Addition for point
-POINT point_add(POINT a, POINT b) {
+_POINT point_add(_POINT a, _POINT b) {
 
     return point(a.x+b.x, a.y+b.y);
 }
 
 
 // Calculate determinant
-float mat2_det(MAT2 m) {
+float MATRIX2_det(MATRIX2 m) {
 
     return m.m11 * m.m22 - m.m12 * m.m21;
 }
 
 
 // Inverse matrix
-MAT2 mat2_inverse(MAT2 m) {
+MATRIX2 MATRIX2_inverse(MATRIX2 m) {
 
-    float d = 1.0f / mat2_det(m);
-    MAT2 i;
+    float d = 1.0f / MATRIX2_det(m);
+    MATRIX2 i;
     i.m11 = d * (m.m22); i.m21 = d * -m.m21;
     i.m12 = d * -(m.m12); i.m22 = d * m.m11;
     return i;
@@ -59,9 +59,9 @@ MAT2 mat2_inverse(MAT2 m) {
 
 
 // Matrix multiplication
-MAT2 mat2_mul(MAT2 a, MAT2 b) {
+MATRIX2 MATRIX2_mul(MATRIX2 a, MATRIX2 b) {
 
-    MAT2 r;
+    MATRIX2 r;
     r.m11 =  a.m11 * b.m11 + a.m21 * b.m12;
     r.m21 =  a.m11 * b.m21 + a.m21 * b.m22;
     r.m12 =  a.m12 * b.m11 + a.m22 * b.m12;
@@ -71,7 +71,7 @@ MAT2 mat2_mul(MAT2 a, MAT2 b) {
 
 
 // Multiple matrix with a vector
-VEC2 mat2_mul_vec2(MAT2 m, VEC2 v) {
+VEC2 MATRIX2_mul_vec2(MATRIX2 m, VEC2 v) {
     
     VEC2 r;
     r.x =  m.m11 * v.x + m.m21 * v.y;
@@ -82,8 +82,8 @@ VEC2 mat2_mul_vec2(MAT2 m, VEC2 v) {
 
 
 // Float to int, matrices
-MAT2INT mat2_to_int(MAT2 m) {
+MATRIX2INT MATRIX2_to_int(MATRIX2 m) {
 
-    return (MAT2INT) { (int)(m.m11 * 1000.0f), (int)(m.m21 * 1000.0f),
+    return (MATRIX2INT) { (int)(m.m11 * 1000.0f), (int)(m.m21 * 1000.0f),
         (int)(m.m12 * 1000.0f), (int)(m.m22 * 1000.0f) };
 }

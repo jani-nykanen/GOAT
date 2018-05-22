@@ -18,7 +18,7 @@
 #define MAX_SCENES 32
 
 // Window size
-static POINT winSize;
+static _POINT winSize;
 
 // Is running
 static bool isRunning;
@@ -41,9 +41,9 @@ static Uint32 frameWait;
 static CONFIG conf;
 
 // Canvas position
-static POINT canvasPos;
+static _POINT canvasPos;
 // Canvas size
-static POINT canvasSize;
+static _POINT canvasSize;
 // Canvas
 static FRAME* canvas;
 
@@ -121,7 +121,7 @@ static int core_init_SDL()
         core_toggle_fullscreen();
 
     // Create renderer
-    int flag = conf.vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_SOFTWARE;
+    int flag = conf.vsync ? (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : SDL_RENDERER_ACCELERATED;
     rend = SDL_CreateRenderer(window,-1,flag);
     if(rend == NULL) {
 
@@ -445,6 +445,7 @@ static void core_draw() {
 // Destroy
 static void core_destroy() {
 
+
     int i = 0;
     SCENE s;
 
@@ -453,8 +454,8 @@ static void core_destroy() {
 
         s = scenes[i];
         if(s.fnDestroy != NULL) {
-
-            s.fnDestroy();
+            
+           s.fnDestroy();
         }
 
     }
@@ -466,6 +467,8 @@ static void core_destroy() {
     // Destroy content
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(window);
+
+    
     
 }
 
@@ -620,7 +623,7 @@ int core_run_application(const char* configPath) {
 
 
 // Get window size
-POINT core_window_size() {
+_POINT core_window_size() {
 
     return winSize;
 }

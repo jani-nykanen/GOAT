@@ -19,10 +19,10 @@ static const float CLOUD_SPEED = 0.5f;
 static const float PLATFORM_INTERVAL = 64.0f;
 
 // Bitmaps
-static BITMAP* bmpSky;
-static BITMAP* bmpClouds;
-static BITMAP* bmpMountains;
-static BITMAP* bmpPlatforms;
+static _BITMAP* bmpSky;
+static _BITMAP* bmpClouds;
+static _BITMAP* bmpMountains;
+static _BITMAP* bmpPlatforms;
 
 // Cloud position
 static float cloudPos;
@@ -338,7 +338,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 1:
     case 2:
 
-        draw_bitmap_region(bmpPlatforms,32+id*16,48,16,16,x*16,y-16, flip);
+        draw__BITMAP_region(bmpPlatforms,32+id*16,48,16,16,x*16,y-16, flip);
         break;
 
     // Tall
@@ -346,7 +346,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 4:
     case 5:
 
-        draw_bitmap_region(bmpPlatforms,176 + (id-3)*32,0,32,48,x*16,y-48, flip);
+        draw__BITMAP_region(bmpPlatforms,176 + (id-3)*32,0,32,48,x*16,y-48, flip);
         break;
 
     // Big
@@ -354,7 +354,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 7:
     case 8:
 
-        draw_bitmap_region(bmpPlatforms,32 + (id-6)*48,16,48,32,x*16,y-32, flip);
+        draw__BITMAP_region(bmpPlatforms,32 + (id-6)*48,16,48,32,x*16,y-32, flip);
         break;
 
     // Low
@@ -362,7 +362,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 10:
     case 11:
 
-        draw_bitmap_region(bmpPlatforms,0,16 + (id-9)*16,32,16,x*16,y-16, flip);
+        draw__BITMAP_region(bmpPlatforms,0,16 + (id-9)*16,32,16,x*16,y-16, flip);
         break;
 
     default:
@@ -389,15 +389,15 @@ static void draw_platform(PLATFORM* p) {
             right = i < TILE_COUNT-1 && p->tiles[i+1] != 2;
 
             // Draw "stripe"
-            draw_bitmap_region(bmpPlatforms,8*16,0,16,16, i*16, y-16, 0);
+            draw__BITMAP_region(bmpPlatforms,8*16,0,16,16, i*16, y-16, 0);
 
             if(left)
-                draw_bitmap_region(bmpPlatforms,7*16,0,16,16, i*16 -16, y-16, 0);
+                draw__BITMAP_region(bmpPlatforms,7*16,0,16,16, i*16 -16, y-16, 0);
 
             if(right)
-                draw_bitmap_region(bmpPlatforms,9*16,0,16,16, i*16 +16, y-16, 0); 
+                draw__BITMAP_region(bmpPlatforms,9*16,0,16,16, i*16 +16, y-16, 0); 
 
-            draw_bitmap_region(bmpPlatforms,6*16,0,16,16, i*16, y, 0);
+            draw__BITMAP_region(bmpPlatforms,6*16,0,16,16, i*16, y, 0);
         }
     }
 
@@ -429,14 +429,14 @@ static void draw_platform(PLATFORM* p) {
             else if(right)
                 tile = 4;
 
-            draw_bitmap_region(bmpPlatforms,tile*16,0,16,16, i*16, y, 0);
+            draw__BITMAP_region(bmpPlatforms,tile*16,0,16,16, i*16, y, 0);
 
             // Draw grass to left & right
             if(left)
-                draw_bitmap_region(bmpPlatforms,1*16,0,16,16, (i-1)*16, y, 0);
+                draw__BITMAP_region(bmpPlatforms,1*16,0,16,16, (i-1)*16, y, 0);
 
             if(right)
-                draw_bitmap_region(bmpPlatforms,5*16,0,16,16, (i+1)*16, y, 0);
+                draw__BITMAP_region(bmpPlatforms,5*16,0,16,16, (i+1)*16, y, 0);
         }
     }
 }
@@ -504,10 +504,10 @@ static void gem_platform_collision(GEM* g, PLATFORM* p) {
 int stage_init(ASSET_PACK* ass) {
 
     // Get assets
-    bmpSky = (BITMAP*)assets_get(ass, "sky");
-    bmpClouds = (BITMAP*)assets_get(ass, "clouds");
-    bmpMountains = (BITMAP*)assets_get(ass, "mountains");
-    bmpPlatforms = (BITMAP*)assets_get(ass, "platforms");
+    bmpSky = (_BITMAP*)assets_get(ass, "sky");
+    bmpClouds = (_BITMAP*)assets_get(ass, "clouds");
+    bmpMountains = (_BITMAP*)assets_get(ass, "mountains");
+    bmpPlatforms = (_BITMAP*)assets_get(ass, "platforms");
 
     // Set seed
     srand(time(NULL));
@@ -565,16 +565,16 @@ void stage_draw() {
     int cpos = (int)round(cloudPos);
 
     // Sky
-    draw_bitmap_fast(bmpSky, 0, 0);
+    draw__BITMAP_fast(bmpSky, 0, 0);
 
     // Clouds
     for(; i < 2; ++ i) {
 
-        draw_bitmap(bmpClouds,cpos + i*bmpClouds->width, 80, 0);
+        draw__BITMAP(bmpClouds,cpos + i*bmpClouds->width, 80, 0);
     }
 
     // Mountains
-    draw_bitmap(bmpMountains,0,192 -96, 0);
+    draw__BITMAP(bmpMountains,0,192 -96, 0);
 
     // Draw platforms
     draw_platforms();

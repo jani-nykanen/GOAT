@@ -7,7 +7,7 @@
 
 #include "../engine/scene.h"
 
-// Get leaderboard menu scene
+// Get title screen scene
 SCENE ts_get_scene();
 
 #endif // __TITLE_SCREEN__

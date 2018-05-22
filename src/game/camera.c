@@ -4,6 +4,8 @@
 
 #include "camera.h"
 
+#include "../include/std.h"
+
 // Global camera
 static CAMERA globalCamera;
 

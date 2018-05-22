@@ -16,17 +16,17 @@ static const float CURSOR_WAVE_SPEED = 0.1f;
 static const float MOVE_TIMER_MAX = 8.0f;
 
 // Bitmaps
-static BITMAP* bmpCursor;
+static _BITMAP* bmpCursor;
 
 // Samples
 static SAMPLE* sSelect;
 
 
-// Initialize cursor (i.e. load a bitmap)
+// Initialize cursor (i.e. load a _BITMAP)
 void init_cursor(ASSET_PACK* ass) {
 
     // Get assets
-    bmpCursor = (BITMAP*)assets_get(ass, "cursor");
+    bmpCursor = (_BITMAP*)assets_get(ass, "cursor");
     sSelect = (SAMPLE*)assets_get(ass, "select");
 }
 
@@ -99,7 +99,7 @@ void cursor_draw(CURSOR* c, int x, int y, int yoff) {
             + yoff*c->dir/MOVE_TIMER_MAX * c->moveTimer  );
     }
 
-     draw_bitmap(bmpCursor,x-16 + (int)(sinf(c->waveTimer) * CURSOR_AMPLITUDE),
+     draw__BITMAP(bmpCursor,x-16 + (int)(sinf(c->waveTimer) * CURSOR_AMPLITUDE),
             cursorY, 0);
 }
 

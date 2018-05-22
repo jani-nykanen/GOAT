@@ -34,8 +34,8 @@ static float darkTimer;
 static int darkCount;
 
 // Bitmaps
-static BITMAP* bmpFont;
-static BITMAP* bmpFont2;
+static _BITMAP* bmpFont;
+static _BITMAP* bmpFont2;
 
 // Samples
 static SAMPLE* sAccept;
@@ -318,8 +318,8 @@ static int lb_menu_init() {
 
     // Get assets
     ASSET_PACK* ass = global_get_asset_pack();
-    bmpFont = (BITMAP*)assets_get(ass, "font");
-    bmpFont2 = (BITMAP*)assets_get(ass, "font2"); 
+    bmpFont = (_BITMAP*)assets_get(ass, "font");
+    bmpFont2 = (_BITMAP*)assets_get(ass, "font2"); 
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sReject = (SAMPLE*)assets_get(ass, "reject");
@@ -418,7 +418,7 @@ static void lb_menu_draw() {
     translate(0, 0);
 
     // Draw canvas copy
-    draw_bitmap_fast(canvasCopy, 0, 0);
+    draw__BITMAP_fast(canvasCopy, 0, 0);
 
     // Darken
     if(!isTitle)

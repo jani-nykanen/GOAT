@@ -21,7 +21,7 @@ static const float WAIT_TIME = 20.0f;
 static const int HEART_PROB_MAX = 16;
 
 // Bitmaps
-static BITMAP* bmpGem;
+static _BITMAP* bmpGem;
 
 // Samples
 static SAMPLE* sGem;
@@ -34,8 +34,8 @@ static int heartProb;
 // Initialize gems
 void init_gems(ASSET_PACK* ass) {
 
-    // Get bitmaps
-    bmpGem = (BITMAP*)assets_get(ass, "gem");
+    // Get Bitmaps
+    bmpGem = (_BITMAP*)assets_get(ass, "gem");
 
     sGem = (SAMPLE*)assets_get(ass, "sGem");
     sHeal = (SAMPLE*)assets_get(ass, "heal");
@@ -188,7 +188,7 @@ void gem_draw(GEM* gem) {
         if(gem->deathTimer > 0.0f) {
 
             int fade = 1+ (int)round(gem->deathTimer / DEATH_MAX * 8.0f);
-            draw_bitmap_region_fading(bmpGem,0,gem->isHeart ? 24 : 0,24,24,x,y, FLIP_NONE, fade, get_alpha());
+            draw__BITMAP_region_fading(bmpGem,0,gem->isHeart ? 24 : 0,24,24,x,y, FLIP_NONE, fade, get_alpha());
         }   
         return;
     }

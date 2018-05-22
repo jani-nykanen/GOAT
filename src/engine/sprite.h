@@ -25,9 +25,9 @@ SPRITE create_sprite(int w, int h);
 void spr_animate(SPRITE*s, int row, int start, int end, float speed, float tm);
 
 // Draw a sprite frame
-void spr_draw_frame(SPRITE*s, BITMAP* bmp, int frame, int row, int x, int y, int flip);
+void spr_draw_frame(SPRITE*s, _BITMAP* bmp, int frame, int row, int x, int y, int flip);
 
 // Draw a sprite
-void spr_draw(SPRITE* s, BITMAP* bmp, int x, int y, int flip);
+void spr_draw(SPRITE* s, _BITMAP* bmp, int x, int y, int flip);
 
 #endif // __SPRITE__

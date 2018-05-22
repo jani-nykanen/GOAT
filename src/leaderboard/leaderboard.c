@@ -19,7 +19,7 @@
 #define CHECK_MUL 255
 
 // Word type
-typedef char WORD[WORD_LENGTH];
+typedef char _WORD[WORD_LENGTH];
 
 // Handle
 static CURL* handle;
@@ -42,7 +42,7 @@ static void clear_buffer() {
 
 
 // Get the next word from the buffer, starting from certain index
-size_t next_word(int index, WORD w) {
+size_t next_word(int index, _WORD w) {
 
     // Clear word
     memset(w, '\0', WORD_LENGTH);
@@ -118,7 +118,7 @@ static void get_lb(LEADERBOARD* lb, int index) {
 
     int i = 0;
     int lbi = 0;
-    WORD w;
+    _WORD w;
 
     // Get names & scores
     while(index != -1) {
@@ -182,7 +182,7 @@ int lb_get(LEADERBOARD* lb) {
     }
 
     // Get words
-    WORD w;
+    _WORD w;
     int index = 0;
 
     // Get first word
@@ -213,7 +213,7 @@ int lb_add_score(LEADERBOARD* lb, const char* name, int score) {
     }
 
     // Get first word
-    WORD w;
+    _WORD w;
     int index = 0;
     index = next_word(index, w);
     if(strcmp(w,"true") != 0) {

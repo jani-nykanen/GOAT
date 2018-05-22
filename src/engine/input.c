@@ -27,11 +27,11 @@ static Uint8 joystate[JOY_MAX];
 // Mouse buttons
 static Uint8 mbuttons[BUTTON_MAX];
 // Mouse position
-static POINT mousePos;
+static _POINT mousePos;
 
 // Canvas info
-static POINT canvasPos;
-static POINT canvasSize;
+static _POINT canvasPos;
+static _POINT canvasSize;
 
 
 // initialize
@@ -184,7 +184,7 @@ Uint8 input_get_key(int key) {
 
 
 // Set view info
-void input_set_view_info(POINT pos, POINT size) {
+void input_set_view_info(_POINT pos, _POINT size) {
 
     canvasPos = pos;
     canvasSize = size;
@@ -192,11 +192,11 @@ void input_set_view_info(POINT pos, POINT size) {
 
 
 // Get mouse position
-POINT input_get_cursor_pos() {
+_POINT input_get_cursor_pos() {
 
-    POINT mpos = mousePos;
+    _POINT mpos = mousePos;
     FRAME* gframe = get_global_frame();
-    POINT fsize = point(gframe->width, gframe->height);
+    _POINT fsize = point(gframe->width, gframe->height);
 
     mpos.x -= canvasPos.x;
     mpos.y -= canvasPos.y;
@@ -204,7 +204,7 @@ POINT input_get_cursor_pos() {
     float sx = (float)fsize.x / (float)canvasSize.x;
     float sy = (float)fsize.y / (float)canvasSize.y;
      
-    POINT ret;
+    _POINT ret;
 
     ret.x = (int)(sx* (float)mpos.x);
     ret.y = (int)(sy* (float)mpos.y);

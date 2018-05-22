@@ -37,7 +37,7 @@ float min_2f(float a, float b);
 float max_2f(float a, float b);
 
 // Order three points, compare y axis
-void order_points_y_3(POINT* a, POINT* b, POINT* c);
+void order_points_y_3(_POINT* a, _POINT* b, _POINT* c);
 
 // Is inside triangle
 bool inside_triangle(int px, int py, int x1, int y1, int x2, int y2, int x3, int y3);

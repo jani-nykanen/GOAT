@@ -52,10 +52,10 @@ void input_update();
 Uint8 input_get_key(int key);
 
 // Set view info
-void input_set_view_info(POINT canvasPos, POINT canvasSize);
+void input_set_view_info(_POINT canvasPos, _POINT canvasSize);
 
 // Get mouse position
-POINT input_get_cursor_pos();
+_POINT input_get_cursor_pos();
 
 // Get mouse button
 int input_get_mouse_button(int button);

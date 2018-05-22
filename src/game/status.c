@@ -13,6 +13,7 @@ static int HEALTH_MAX = 3;
 static int SCORE_BASE = 10;
 static float HIDE_MAX = 30.0f;
 static float APPEAR_MAX = 60.0f;
+static float CONTROL_MAX = 180.0f;
 
 // Status variables
 static int health;
@@ -22,15 +23,18 @@ static unsigned int score;
 static int coins;
 static bool isGameOver;
 
-// Bitmap
-static BITMAP* bmpHUD;
-static BITMAP* bmpFont;
-static BITMAP* bmpFontBig;
+// _BITMAP
+static _BITMAP* bmpHUD;
+static _BITMAP* bmpFont;
+static _BITMAP* bmpFontBig;
+static _BITMAP* bmpControls;
 
 // Hide timer
 static float hideTimer;
 // Appear timer
 static float appearTimer;
+// Control timer
+static float controlTimer;
 
 
 // Get score string
@@ -60,9 +64,10 @@ static void get_score_string(char* buf, int bufLen) {
 void init_status(ASSET_PACK* ass) {
 
     // Get assets
-    bmpHUD = (BITMAP*)assets_get(ass, "HUD");
-    bmpFont = (BITMAP*)assets_get(ass, "font");
-    bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
+    bmpHUD = (_BITMAP*)assets_get(ass, "HUD");
+    bmpFont = (_BITMAP*)assets_get(ass, "font");
+    bmpFontBig = (_BITMAP*)assets_get(ass, "fontBig");
+    bmpControls = (_BITMAP*)assets_get(ass, "controls");
 
     // (Re)set variables
     reset_status();
@@ -80,11 +85,18 @@ void reset_status() {
     isGameOver = false;
     hideTimer = 0.0f;
     appearTimer = 0.0f;
+    controlTimer = 0.0f;
 }
 
 
 // Update status
 void status_update(float tm) {
+
+    // Update control timer
+    if(controlTimer < CONTROL_MAX) {
+
+        controlTimer += 1.0f * tm;
+    }
 
     // Update fading health
     if(healthFade != 0) {
@@ -150,7 +162,7 @@ void status_draw() {
 
         sx = hmax >= i ? 24 : 0;
 
-        draw_bitmap_region(bmpHUD, sx,0,24,24, 
+        draw__BITMAP_region(bmpHUD, sx,0,24,24, 
             HEART_X + HEART_DELTA*i, HEART_Y, 0 );
     }
 
@@ -168,7 +180,7 @@ void status_draw() {
 
         int hpos = healthFade == 1 ? health : health-1;
 
-        draw_bitmap_region_fading(bmpHUD, sx,0,24,24, 
+        draw__BITMAP_region_fading(bmpHUD, sx,0,24,24, 
             HEART_X + HEART_DELTA*(hpos), HEART_Y, 0, fade, get_alpha() );
     }
 
@@ -190,7 +202,20 @@ void status_draw() {
 
     snprintf(str, 16, "~%d", coins);
     draw_text(bmpFontBig, str, coinX, COIN_TEXT_Y, -16, 0, false);
-    draw_bitmap_region(bmpHUD,48,0,24,24, coinX -16, COIN_Y, 0);
+    draw__BITMAP_region(bmpHUD,48,0,24,24, coinX -16, COIN_Y, 0);
+
+    // Draw controls
+    if(controlTimer < CONTROL_MAX) {
+
+        translate(0, 0);
+
+        int x = 0;
+        if(controlTimer >= CONTROL_MAX -30.0f) {
+
+            x = -(int)floorf( (controlTimer-(CONTROL_MAX-30.0f)) / 30.0f * 72.0f);
+        }
+        draw__BITMAP(bmpControls, x, 0, 0);
+    }
 
 }
 

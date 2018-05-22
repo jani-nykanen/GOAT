@@ -50,9 +50,6 @@ static int global_init() {
         return 1;   
     }
 
-    // Play music
-    fade_in_music((MUSIC*)assets_get(globalAssets, "theme"), 0.50f, -1, 1000);
-
     // Initialize virtual gamepad
     vpad_init();
 
@@ -63,9 +60,13 @@ static int global_init() {
     vpad_read_config(c.keyconfPath);
 
     // Set default values
-    fadeMode = 1;
-    fadeTimer = FADE_MAX;
+    fadeMode = 0;
+    fadeTimer = 0.0f;
     fadeSpeed = 2.0f;
+
+    // Set volumes
+    set_global_music_volume(c.musicVol);
+    set_global_sample_volume(c.sampleVol);
 
     return 0;
 }

@@ -12,10 +12,10 @@
 #include "../lib/stb_image.h"
 
 // Load a bitmap
-BITMAP* bitmap_load(const char* path) {
+_BITMAP* bitmap_load(const char* path) {
 
     // Allocate memory
-    BITMAP* bmp = (BITMAP*)malloc(sizeof(BITMAP));
+    _BITMAP* bmp = (_BITMAP*)malloc(sizeof(_BITMAP));
     if(bmp == NULL) {
 
         error_mem_alloc();
@@ -28,7 +28,7 @@ BITMAP* bitmap_load(const char* path) {
     Uint8* pdata = stbi_load(path,&w,&h,&comp,4);
     if(pdata == NULL) {
 
-        error_throw("Failed to load a bitmap in ",path);
+        error_throw("Failed to load a _BITMAP in ",path);
         return NULL;
     }
 

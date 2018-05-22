@@ -20,11 +20,13 @@
 // Configuration type
 typedef struct {
 
-    POINT winSize;
-    POINT canvasSize;
+    _POINT winSize;
+    _POINT canvasSize;
     bool fullscreen;
     bool vsync;
     int frameRate;
+    int musicVol;
+    int sampleVol;
     char caption[CAPTION_STRING_SIZE];
     char assetPath[ASSET_PATH_SIZE];
     char keyconfPath[ASSET_PATH_SIZE];

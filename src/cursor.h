@@ -20,7 +20,7 @@ typedef struct {
 }
 CURSOR;
 
-// Initialize cursor (i.e. load a bitmap)
+// Initialize cursor (i.e. load a _BITMAP)
 void init_cursor(ASSET_PACK* ass);
 
 // Create a cursor
