@@ -34,7 +34,6 @@ static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
 static BITMAP* bmpFontBig;
 static BITMAP* bmpLogo;
-static BITMAP* bmpCursor;
 
 // Samples
 static SAMPLE* sAccept;
@@ -190,7 +189,6 @@ static int ts_init() {
     bmpFont2 = (BITMAP*)assets_get(ass, "font2"); 
     bmpLogo = (BITMAP*)assets_get(ass, "logo"); 
     bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
-    bmpCursor = (BITMAP*)assets_get(ass, "cursor");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sReject = (SAMPLE*)assets_get(ass, "reject");

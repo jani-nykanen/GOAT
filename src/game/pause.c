@@ -27,7 +27,6 @@ static const int ELEMENT_COUNT = 5;
 // Bitmaps
 static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
-static BITMAP* bmpCursor;
 
 // Samples
 static SAMPLE* sAccept;
@@ -152,7 +151,6 @@ int init_pause(ASSET_PACK* ass) {
     // Get bitmaps
     bmpFont = (BITMAP*)assets_get(ass, "font");
     bmpFont2 = (BITMAP*)assets_get(ass, "font2");
-    bmpCursor = (BITMAP*)assets_get(ass, "cursor");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sReject = (SAMPLE*)assets_get(ass, "reject");

@@ -279,6 +279,8 @@ static void update_error_screen(float tm) {
     if(vpad_get_button(0) == STATE_PRESSED ||
        vpad_get_button(2) == STATE_PRESSED) {
 
+        play_sample(sAccept, 0.80f);
+
         if(isTitle)
             core_swap_scene("title");
         else
@@ -300,6 +302,8 @@ static void update_results_screen(float tm) {
 
     if(vpad_get_button(0) == STATE_PRESSED ||
        vpad_get_button(2) == STATE_PRESSED) {
+
+        play_sample(sAccept, 0.80f);
 
         if(isTitle)
             core_swap_scene("title");

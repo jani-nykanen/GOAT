@@ -44,6 +44,22 @@ static bool paused;
 static SAMPLE* sPause;
 
 
+// Find the next gem
+static GEM* find_next() {
+
+    int i = 0;
+    for(; i < GEM_COUNT; ++ i) {
+
+        if(gems[i].exist == false && gems[i].deathTimer <= 0.0f) {
+
+            return &gems[i];
+        }
+    }
+
+    return &gems[0];
+}
+
+
 // Update speed
 static void update_speed(float tm) {
 
@@ -266,35 +282,18 @@ SCENE game_get_scene() {
 
 
 // Add a gem to the game world
-// TODO: A method for "find first gem"
 void add_gem(float x, float y) {
 
-    // Find the first gem that does not exist
-    int i = 0;
-    for(; i < GEM_COUNT; ++ i) {
-
-        if(gems[i].exist == false && gems[i].deathTimer <= 0.0f) {
-
-            gems[i] = create_gem(vec2(x, y));
-            return;
-        }
-    }
+    GEM* gem = find_next();
+    *gem = create_gem(vec2(x, y));
 }
 
 
 // Add a gem with a gravity to the game world
 void add_gem_with_gravity(float x, float y, float sx, float sy) {
 
-    // Find the first gem that does not exist
-    int i = 0;
-    for(; i < GEM_COUNT; ++ i) {
-
-        if(gems[i].exist == false && gems[i].deathTimer <= 0.0f) {
-
-            gems[i] = create_gem_with_gravity(vec2(x, y), vec2(sx, sy));
-            return;
-        }
-    }
+    GEM* gem = find_next();
+    *gem = create_gem_with_gravity(vec2(x, y), vec2(sx, sy));
 }
 
 

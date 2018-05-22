@@ -31,7 +31,6 @@ static BITMAP* bmpGameover;
 static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
 static BITMAP* bmpFontBig;
-static BITMAP* bmpCursor;
 
 // Samples
 static SAMPLE* sAccept;
@@ -142,7 +141,6 @@ void init_game_over(ASSET_PACK* ass) {
     bmpGameover = (BITMAP*)assets_get(ass, "gameOver");
     bmpFont = (BITMAP*)assets_get(ass, "font");
     bmpFont2 = (BITMAP*)assets_get(ass, "font2");
-    bmpCursor = (BITMAP*)assets_get(ass, "cursor");
     bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
