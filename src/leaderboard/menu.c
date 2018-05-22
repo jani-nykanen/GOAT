@@ -335,8 +335,8 @@ static int lb_menu_init() {
         return 1;
 
     // Initialize leaderboards
-    // https://game-leaderboards.000webhostapp.com
-    if(lb_init_http("http://localhost:8000") == 1) {
+    // http://localhost:8000
+    if(lb_init_http("https://game-leaderboards.000webhostapp.com") == 1) {
 
         return 1;
     }

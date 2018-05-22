@@ -15,6 +15,8 @@
 #define WORD_LENGTH 32
 // Check value modulo
 #define CHECK_MOD 1023
+// Check value multiplier
+#define CHECK_MUL 255
 
 // Word type
 typedef char WORD[WORD_LENGTH];
@@ -203,7 +205,8 @@ int lb_add_score(LEADERBOARD* lb, const char* name, int score) {
     
     // Send request
     char str[1024];
-    snprintf(str, 1024, "&mode=set&name=%s&score=%d&check=%d", name, score, score % CHECK_MOD);
+    snprintf(str, 1024, "&mode=set&name=%s&score=%d&check=%d", name, score, 
+        (score * CHECK_MUL) % CHECK_MOD);
     if(send_request(str) == 1) {
 
         return 1;
