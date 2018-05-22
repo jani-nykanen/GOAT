@@ -6,6 +6,7 @@
 
 #include "game.h"
 
+#include "../cursor.h"
 #include "../vpad.h"
 #include "../global.h"
 
@@ -19,9 +20,6 @@ static const char* PAUSE_TEXT[] = {
 static const char* AUDIO_TEXT_OFF = "Audio: Off";
 static const int PAUSE_BOX_W = 128;
 static const int PAUSE_BOX_H = 88;
-static const float CURSOR_AMPLITUDE = 2.0f;
-static const float CURSOR_WAVE_SPEED = 0.1f;
-static const float MOVE_TIMER_MAX = 8.0f;
 static const float DARK_INTERVAL = 4.0f;
 static const int DARK_MAX = 4;
 static const int ELEMENT_COUNT = 5;
@@ -39,16 +37,8 @@ static SAMPLE* sSelect;
 // Canvas copy
 static FRAME* canvasCopy;
 
-// Cursor pos
-static int cursorPos;
-// Cursor wave
-static float cursorWave;
-// Cursor movement timer
-static float moveTimer;
-// Is the cursor moving
-static bool moving;
-// Cursor direction
-static int cursorDir;
+// Cursor
+static CURSOR cursor;
 
 // Dark timer
 static float darkTimer;
@@ -89,7 +79,7 @@ static void draw_pause_text(int x, int y, int yoff) {
         if(i == 3 && !audioState)
             text = AUDIO_TEXT_OFF;
 
-        draw_text( (moving || (cursorPos != i)) ? bmpFont : bmpFont2, 
+        draw_text( (cursor.moving || (cursor.pos != i)) ? bmpFont : bmpFont2, 
             text,x,y +yoff*i,-7,0,false);
     }
 }
@@ -101,7 +91,7 @@ static void menu_action() {
     bool audioState = music_enabled() && samples_enabled();
     bool playSample = true;
 
-    switch(cursorPos) {
+    switch(cursor.pos) {
 
     // Resume
     case 0:
@@ -186,8 +176,6 @@ int init_pause(ASSET_PACK* ass) {
 // Update
 void pause_update(float tm) {
 
-    const float DELTA = 0.5f;
-
     // Update darkness
     if(darkCount < DARK_MAX) {
 
@@ -199,22 +187,11 @@ void pause_update(float tm) {
         }
     }
 
-    // Update cursor wave
-    cursorWave += CURSOR_WAVE_SPEED * tm;
-
-    // Move
-    if(moving) {
-
-        moveTimer += 1.0f * tm;
-        if(moveTimer >= MOVE_TIMER_MAX)
-            moving = false;
-        else
-            return;
-    }
+    cursor_update(&cursor, tm);
 
     // If pause button pressed, take action
-    if(vpad_get_button(2) == STATE_PRESSED ||
-       vpad_get_button(0) == STATE_PRESSED ) {
+    if(!cursor.moving && ( vpad_get_button(2) == STATE_PRESSED ||
+       vpad_get_button(0) == STATE_PRESSED ) ) {
 
         menu_action();
         return;
@@ -227,27 +204,6 @@ void pause_update(float tm) {
         active = false;
         return;
     }
-
-    // Move cursor
-    int oldPos = cursorPos;
-    VEC2 stick = vpad_get_stick();
-
-    // Limit
-    if(cursorPos < ELEMENT_COUNT-1 && stick.y > DELTA)
-        ++ cursorPos;
-
-    else if(cursorPos > 0 && stick.y < -DELTA)
-        -- cursorPos;
-
-    // Set moving
-    if(cursorPos != oldPos) {
-
-        moving = true;
-        moveTimer = 0.0f;
-        cursorDir = cursorPos > oldPos ? 1 : -1;
-
-        play_sample(sSelect, 0.70f);
-    }
 }
 
 
@@ -256,9 +212,8 @@ void pause_update(float tm) {
 void pause_draw() {
 
     const int YOFF = 14;
-
-    int x = 128-PAUSE_BOX_W/2;
-    int y = 96-PAUSE_BOX_H/2;
+    const int POS_X = 128-PAUSE_BOX_W/2 + 18;
+    const int POS_Y = 96-PAUSE_BOX_H/2 + 8; 
 
     // Draw canvas copy
     draw_bitmap_fast((BITMAP*)canvasCopy,0,0);
@@ -267,20 +222,13 @@ void pause_draw() {
     darken(darkCount);
 
     // Draw box
-    draw_pause_box(x,y,  PAUSE_BOX_W, PAUSE_BOX_H);
+    draw_pause_box(POS_X-18,POS_Y-8,  PAUSE_BOX_W, PAUSE_BOX_H);
 
     // Draw text
-    draw_pause_text(x + 18, y + 8,YOFF);
+    draw_pause_text(POS_X, POS_Y,YOFF);
 
     // Draw cursor
-    int cursorY = y + 8 + cursorPos*YOFF;
-    if(moving) {
-
-        cursorY = y + 8 + (int)floor((cursorPos-cursorDir)*YOFF + YOFF*cursorDir/MOVE_TIMER_MAX * moveTimer  );
-    }
-
-    draw_bitmap(bmpCursor,x + 4 + (int)(sinf(cursorWave) * CURSOR_AMPLITUDE),
-         cursorY, 0);
+    cursor_draw(&cursor, POS_X,POS_Y, YOFF);
 }
 
 
@@ -296,12 +244,9 @@ void pause_active() {
 
     // Set values
     active = true;
-    cursorPos = 0;
-    cursorWave = 0.0f;
-    moving = false;
-    moveTimer = 0.0f;
     darkTimer = 0.0f;
     darkCount = 0;
+    cursor = create_cursor(ELEMENT_COUNT);
 
     // Create a copy of the canvas
     frame_copy(get_global_frame(), canvasCopy);

@@ -5,6 +5,7 @@
 #include "global.h"
 
 #include "vpad.h"
+#include "cursor.h"
 
 #include "include/std.h"
 #include "include/renderer.h"
@@ -54,6 +55,9 @@ static int global_init() {
 
     // Initialize virtual gamepad
     vpad_init();
+
+    // Initialize cursor
+    init_cursor(globalAssets);
 
     // Add buttons from the key configuration file
     vpad_read_config(c.keyconfPath);

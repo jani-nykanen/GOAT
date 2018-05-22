@@ -7,6 +7,7 @@
 #include "game.h"
 #include "status.h"
 
+#include "../cursor.h"
 #include "../vpad.h"
 #include "../global.h"
 
@@ -20,9 +21,6 @@
 static const float AMPLITUDE = 16.0f;
 static const float WAVE_SPEED = 0.05f;
 static const float GOVER_MAX = 60.0f;
-static const float CURSOR_AMPLITUDE = 2.0f;
-static const float CURSOR_WAVE_SPEED = 0.1f;
-static const float MOVE_TIMER_MAX = 8.0f;
 static const char* GOVER_TEXT[] = {
     "Retry", "Submit score", "Return to menu"
 };
@@ -45,16 +43,8 @@ static float waveTimer;
 // Game over timer
 static float goverTimer;
 
-// Cursor pos
-static int cursorPos;
-// Cursor wave
-static float cursorWave;
-// Cursor movement timer
-static float moveTimer;
-// Is the cursor moving
-static bool moving;
-// Cursor direction
-static int cursorDir;
+// Cursor
+static CURSOR cursor;
 
 
 // Change to title
@@ -70,7 +60,7 @@ static void draw_menu_text(int x, int y, int yoff) {
     int i = 0;
     for(; i < ELEMENT_COUNT; ++ i) {
 
-        draw_text( (moving || (cursorPos != i)) ? bmpFont : bmpFont2, 
+        draw_text( (cursor.moving || (cursor.pos != i)) ? bmpFont : bmpFont2, 
             GOVER_TEXT[i],x,y +yoff*i,-7,0,false);
     }
 
@@ -117,7 +107,7 @@ static void draw_game_over_text(int dx, int dy) {
 // Menu action
 static void menu_action() {
 
-    switch(cursorPos) {
+    switch(cursor.pos) {
 
     // Retry
     case 0:
@@ -156,7 +146,6 @@ void init_game_over(ASSET_PACK* ass) {
     bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
-    // sReject = (SAMPLE*)assets_get(ass, "reject");
     sSelect = (SAMPLE*)assets_get(ass, "select");
 
     // (Re)set stuff
@@ -166,8 +155,6 @@ void init_game_over(ASSET_PACK* ass) {
 
 // Update
 void gover_update(float tm) {
-
-    const float DELTA = 0.5f;
 
     if(!status_is_game_over()) return;
 
@@ -184,44 +171,13 @@ void gover_update(float tm) {
             menu_action();
             return;
         }
-
-        // Update cursor wave
-        cursorWave += CURSOR_WAVE_SPEED * tm;
     }
 
     // Update text wave
     waveTimer += WAVE_SPEED * tm;
 
-    // Move
-    if(moving) {
-
-        moveTimer += 1.0f * tm;
-        if(moveTimer >= MOVE_TIMER_MAX)
-            moving = false;
-        else
-            return;
-    }
-
-    // Move cursor
-    int oldPos = cursorPos;
-    VEC2 stick = vpad_get_stick();
-
-    // Limit
-    if(cursorPos < ELEMENT_COUNT-1 && stick.y > DELTA)
-        ++ cursorPos;
-
-    else if(cursorPos > 0 && stick.y < -DELTA)
-        -- cursorPos;
-
-    // Set moving
-    if(cursorPos != oldPos) {
-
-        moving = true;
-        moveTimer = 0.0f;
-        cursorDir = cursorPos > oldPos ? 1 : -1;
-
-        play_sample(sSelect, 0.70f);
-    }
+    // Update cursor
+    cursor_update(&cursor, tm);
 }
 
 
@@ -250,14 +206,7 @@ void gover_draw() {
     draw_menu_text(POS_X, POS_Y, YOFF);
 
     // Draw cursor
-    int cursorY = POS_Y + cursorPos*YOFF;
-    if(moving) {
-
-        cursorY = POS_Y + (int)floor((cursorPos-cursorDir)*YOFF + YOFF*cursorDir/MOVE_TIMER_MAX * moveTimer  );
-    }
-
-    draw_bitmap(bmpCursor,POS_X-16 + (int)(sinf(cursorWave) * CURSOR_AMPLITUDE),
-         cursorY, 0);
+    cursor_draw(&cursor, POS_X, POS_Y, YOFF);
 
     // Draw score
     char scoreStr[16];
@@ -272,8 +221,5 @@ void gover_reset() {
     waveTimer = 0.0f;
     goverTimer = 0.0f;
 
-    moving = false;
-    cursorDir = 0;
-    cursorPos = 0;
-    cursorWave = 0.0f;
+    cursor = create_cursor(ELEMENT_COUNT);
 }

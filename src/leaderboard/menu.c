@@ -43,6 +43,8 @@ static SAMPLE* sReject;
 
 // Mode
 static int mode;
+// Is title screen
+static bool isTitle;
 
 // Name buffer
 static char nameBuffer[NAME_LENGTH];
@@ -69,6 +71,19 @@ static char errBuffer[ERROR_SIZE];
 static int t_send_score() {
     
     int res = lb_add_score(&lb, nameBuffer, status_get_score());
+
+    mtx_lock(&mutex);
+    result = res;
+    mtx_unlock(&mutex);
+
+    return 0;
+}
+
+
+// Send the data
+static int t_fetch_score() {
+    
+    int res = lb_get(&lb);
 
     mtx_lock(&mutex);
     result = res;
@@ -109,15 +124,17 @@ static void draw_input_box(int x, int y, int w, int h) {
 }
 
 
-// Draw sending box
-static void draw_sending_box(int x, int y, int w, int h) {
+// Draw sending/fetching box
+static void draw_sending_box(int x, int y, int w, int h, bool sending) {
 
     // Draw borders
     draw_box(x,y,w,h);
 
     // Draw text
-    draw_text(bmpFont, "Sending...", x+w/2,y+2, -7,0, true);
+    draw_text(bmpFont, sending ? "Sending..." : "Fetching...", x+w/2,y+2, -7,0, true);
 }
+
+
 
 
 // Draw error message
@@ -223,14 +240,14 @@ static void name_input(float tm) {
 }
 
 
-// Do sending
-static void do_sending(float tm) {
+// Do sending/fetching
+static void do_sending(float tm, bool send) {
 
     int state = -1;
     if(toBeSent) {
 
         result = -1;
-        thrd_create(&T, t_send_score, NULL);
+        thrd_create(&T, send ? t_send_score : t_fetch_score, NULL);
         toBeSent = false;
     }
     else {
@@ -262,7 +279,10 @@ static void update_error_screen(float tm) {
     if(vpad_get_button(0) == STATE_PRESSED ||
        vpad_get_button(2) == STATE_PRESSED) {
 
-        core_swap_scene("game");
+        if(isTitle)
+            core_swap_scene("title");
+        else
+            core_swap_scene("game");
     }
 }
 
@@ -281,7 +301,10 @@ static void update_results_screen(float tm) {
     if(vpad_get_button(0) == STATE_PRESSED ||
        vpad_get_button(2) == STATE_PRESSED) {
 
-        fade(1, 2.0f, go_to_game);
+        if(isTitle)
+            core_swap_scene("title");
+        else
+            fade(1, 2.0f, go_to_game);
     }
 }
 
@@ -356,10 +379,11 @@ static void lb_menu_update(float tm) {
         name_input(tm);
         break;
     
-    // Sending
+    // Sending/fetching
+    case LB_MENU_FETCHING:
     case LB_MENU_SENDING:
 
-        do_sending(tm);
+        do_sending(tm, mode == LB_MENU_SENDING);
         break;
 
     // Error
@@ -393,7 +417,8 @@ static void lb_menu_draw() {
     draw_bitmap_fast(canvasCopy, 0, 0);
 
     // Darken
-    darken(darkCount);
+    if(!isTitle)
+        darken(darkCount);
 
     // Submit
     // TODO: Stop being lazy and add switchzzzzzzz...
@@ -412,7 +437,7 @@ static void lb_menu_draw() {
             128 - SENDING_W/2,
             96 - SENDING_H/2,
             SENDING_W,
-            SENDING_H 
+            SENDING_H, true
         );
     }
     else if(mode == LB_MENU_ERROR) {
@@ -434,6 +459,15 @@ static void lb_menu_draw() {
             RESULT_YOFF
         );
     }
+    else if(mode == LB_MENU_FETCHING) {
+
+        draw_sending_box(
+            128 - SENDING_W/2,
+            96 - SENDING_H/2,
+            SENDING_W,
+            SENDING_H, false
+        );
+    }
 }
 
 
@@ -447,11 +481,21 @@ static void lb_menu_destroy() {
 // Swap
 static void lb_menu_on_change() {
 
+    if(mode == LB_MENU_FETCHING) {
+
+        toBeSent = true;
+        isTitle = true;
+    }
+    else {
+
+        toBeSent = false;
+        isTitle = false;
+    }
+
     darkTimer = 0.0f;
     darkCount = 0;
     namePointer = 0;
     memset(nameBuffer,0,NAME_LENGTH);
-    toBeSent = false;
 
     // Create a copy of the canvas
     frame_copy(get_global_frame(), canvasCopy);
