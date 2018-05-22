@@ -17,17 +17,20 @@
 
 // Constants
 static const float LOGO_AMPLITUDE = 12.0f;
+static const float ENTER_AMPLITUDE = 6.0f;
 static const float LOGO_WAVE_SPEED = 0.0625f;
 static const float GO_AWAY_MAX = 60.0f;
 
 // Bitmaps
 static BITMAP* bmpFont;
 static BITMAP* bmpFont2;
+static BITMAP* bmpFontBig;
 static BITMAP* bmpLogo;
 
 // Samples
 static SAMPLE* sAccept;
 static SAMPLE* sReject;
+static SAMPLE* sPause;
 
 // Logo wave timer
 static float logoWave;
@@ -35,12 +38,16 @@ static float logoWave;
 static float goAway;
 // Is going away
 static bool goingAway;
+// Phase
+static int phase;
+// Enter pressed
+static bool enterPressed;
 
 
 // Draw logo
 static void draw_logo(int dx, int dy) {
 
-    const float PERIOD = M_PI / 6.0f;
+    const float PERIOD = M_PI / 4.0f;
 
     int w = bmpLogo->width / 4;
 
@@ -56,6 +63,27 @@ static void draw_logo(int dx, int dy) {
 }
 
 
+// Draw "Press enter" text
+static void draw_press_enter(int dx, int dy, int xoff) {
+
+    const float PERIOD = M_PI / 10;
+    const char* TEXT = "PRESS ENTER";
+    char str[1];
+
+    int i = 0;
+    int y;
+    for(; i < 11; ++ i) {
+
+        if(i == 5) continue;
+
+        y = dy + (int)floorf(sinf(logoWave + PERIOD*i) * ENTER_AMPLITUDE);
+
+        str[0] = TEXT[i];
+        draw_text(bmpFontBig,(const char*)str, dx + i* (-xoff), y, xoff,0,false);
+    }
+}
+
+
 // Initialize
 static int ts_init() {
 
@@ -65,14 +93,18 @@ static int ts_init() {
     bmpFont = (BITMAP*)assets_get(ass, "font");
     bmpFont2 = (BITMAP*)assets_get(ass, "font2"); 
     bmpLogo = (BITMAP*)assets_get(ass, "logo"); 
+    bmpFontBig = (BITMAP*)assets_get(ass, "fontBig");
 
     sAccept = (SAMPLE*)assets_get(ass, "accept");
     sReject = (SAMPLE*)assets_get(ass, "reject");
+    sPause = (SAMPLE*)assets_get(ass, "pause");
 
     // Set defaults
     logoWave = 0.0f;
     goingAway = false;
     goAway = 0.0f;
+    enterPressed = false;
+    phase = 0;
 
     return 0;
 }
@@ -103,9 +135,17 @@ static void ts_update(float tm) {
         if(vpad_get_button(0) == STATE_PRESSED
         || vpad_get_button(2) == STATE_PRESSED) {
 
-            goingAway = true;
-            goAway = 0.0f;
-            play_sample(sAccept, 0.80f);
+            if(phase == 0) {
+
+                ++ phase;
+                play_sample(sPause, 0.80f);
+            }
+            else {
+
+                goingAway = true;
+                goAway = 0.0f;
+                play_sample(sAccept, 0.80f);
+            }
         }
 
         // Quit
@@ -120,6 +160,8 @@ static void ts_update(float tm) {
 
 // Draw
 static void ts_draw() {
+
+    translate(0, 0);
 
     // Draw stage background
     stage_draw();
@@ -141,6 +183,27 @@ static void ts_draw() {
         y = 12 - (int)floorf(goAway / GO_AWAY_MAX * 128.0f);
     }
     draw_logo(128-100, y);
+
+    // Translate
+    if(goingAway) {
+
+        y = (int)floorf(goAway / GO_AWAY_MAX * 96.0f);
+        translate(0, y);
+    }
+
+    if(phase == 0) {
+
+        // Draw "Press enter"
+        draw_press_enter(35,192-56, -15);
+    }
+    else {
+
+        // Draw menu
+        // ...
+    }
+
+    // Draw copyright
+    draw_text(bmpFont, "# 2018 Jani Nyk~nen",128,192-14, -7,0, true);
 }
 
 
@@ -150,6 +213,11 @@ static void ts_on_change() {
     stage_reset();
     goingAway = false;
     goAway = 0.0f;
+
+    if(enterPressed) {
+
+        phase = 1;
+    }
 }
 
 
