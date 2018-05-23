@@ -445,7 +445,6 @@ static void core_draw() {
 // Destroy
 static void core_destroy() {
 
-
     int i = 0;
     SCENE s;
 
@@ -457,7 +456,6 @@ static void core_destroy() {
             
            s.fnDestroy();
         }
-
     }
 
     // Close joystick
@@ -467,9 +465,6 @@ static void core_destroy() {
     // Destroy content
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(window);
-
-    
-    
 }
 
 

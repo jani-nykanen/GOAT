@@ -48,7 +48,9 @@ void frame_destroy(FRAME* f) {
 
     if(f == NULL) return;
 
-    free(f->data);
+    if(f->data != NULL)
+        free(f->data);
+        
     free(f);
 }
 

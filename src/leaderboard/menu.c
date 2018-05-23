@@ -336,13 +336,17 @@ static int lb_menu_init() {
 
     // Initialize leaderboards
     // http://localhost:8000
-    if(lb_init_http("https://game-leaderboards.000webhostapp.com") == 1) {
+    if(lb_init_http("http://game-leaderboards.000webhostapp.com") == 1) {
 
         return 1;
     }
 
     // Create a mutex
-    mtx_init(&mutex, mtx_plain);
+    if(mtx_init(&mutex, mtx_plain) == thrd_error) {
+
+        error_throw("Failed to create a mutex!", NULL);
+        return 1;
+    }
 
     return 0;
 }
@@ -478,7 +482,8 @@ static void lb_menu_draw() {
 // Destroy
 static void lb_menu_destroy() {
 
-    frame_destroy(canvasCopy);
+    // frame_destroy(canvasCopy);
+    // mtx_destroy(&mutex);
 }
 
 

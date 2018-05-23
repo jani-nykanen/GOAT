@@ -101,7 +101,7 @@ ASSET_PACK* load_asset_pack(const char* fpath) {
     p->assetCount = 0;
 
     
-    int assetType =0;       
+    int assetType = -1;       
 
     int count = 0;
     
@@ -117,7 +117,6 @@ ASSET_PACK* load_asset_pack(const char* fpath) {
 
         if(strcmp(wr->buffer, "=") == 0) {
              
-            // param = pw_get_word(w, i-1);
             wr_read_next(wr);
             value = wr->buffer;
 
@@ -195,6 +194,7 @@ void assets_destroy(ASSET_PACK* p) {
 
         switch(p->types[i])
         {
+            
         case T_BITMAP:
             bitmap_destroy((_BITMAP*)obj);
             break;
@@ -202,14 +202,16 @@ void assets_destroy(ASSET_PACK* p) {
             destroy_tilemap((TILEMAP*)obj);
             break;
         case T_SAMPLE:
-            destroy_sample((SAMPLE*)obj);
+            //destroy_sample((SAMPLE*)obj);
             break;
         case T_MUSIC:
-            destroy_music((MUSIC*)obj);
+            //destroy_music((MUSIC*)obj);
             break;
 
         default:
             break;
         }
+
+        printf("Asset freed: %s\n", p->names[i].data);
     }
 }

@@ -230,7 +230,7 @@ static void game_draw() {
 // Destroy
 static void game_destroy() {
 
-    pause_destroy();
+    // pause_destroy();
 }
 
 
