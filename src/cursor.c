@@ -99,7 +99,7 @@ void cursor_draw(CURSOR* c, int x, int y, int yoff) {
             + yoff*c->dir/MOVE_TIMER_MAX * c->moveTimer  );
     }
 
-     draw__BITMAP(bmpCursor,x-16 + (int)(sinf(c->waveTimer) * CURSOR_AMPLITUDE),
+     draw_bitmap(bmpCursor,x-16 + (int)(sinf(c->waveTimer) * CURSOR_AMPLITUDE),
             cursorY, 0);
 }
 

@@ -422,7 +422,7 @@ static void lb_menu_draw() {
     translate(0, 0);
 
     // Draw canvas copy
-    draw__BITMAP_fast(canvasCopy, 0, 0);
+    draw_bitmap_fast(canvasCopy, 0, 0);
 
     // Darken
     if(!isTitle)

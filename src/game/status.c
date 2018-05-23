@@ -162,7 +162,7 @@ void status_draw() {
 
         sx = hmax >= i ? 24 : 0;
 
-        draw__BITMAP_region(bmpHUD, sx,0,24,24, 
+        draw_bitmap_region(bmpHUD, sx,0,24,24, 
             HEART_X + HEART_DELTA*i, HEART_Y, 0 );
     }
 
@@ -180,7 +180,7 @@ void status_draw() {
 
         int hpos = healthFade == 1 ? health : health-1;
 
-        draw__BITMAP_region_fading(bmpHUD, sx,0,24,24, 
+        draw_bitmap_region_fading(bmpHUD, sx,0,24,24, 
             HEART_X + HEART_DELTA*(hpos), HEART_Y, 0, fade, get_alpha() );
     }
 
@@ -202,7 +202,7 @@ void status_draw() {
 
     snprintf(str, 16, "~%d", coins);
     draw_text(bmpFontBig, str, coinX, COIN_TEXT_Y, -16, 0, false);
-    draw__BITMAP_region(bmpHUD,48,0,24,24, coinX -16, COIN_Y, 0);
+    draw_bitmap_region(bmpHUD,48,0,24,24, coinX -16, COIN_Y, 0);
 
     // Draw controls
     if(controlTimer < CONTROL_MAX) {
@@ -214,7 +214,7 @@ void status_draw() {
 
             x = -(int)floorf( (controlTimer-(CONTROL_MAX-30.0f)) / 30.0f * 72.0f);
         }
-        draw__BITMAP(bmpControls, x, 0, 0);
+        draw_bitmap(bmpControls, x, 0, 0);
     }
 
 }

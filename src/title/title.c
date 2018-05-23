@@ -70,7 +70,7 @@ static void draw_logo(int dx, int dy) {
 
         y = dy + (int)floorf(sinf(logoWave + PERIOD*i) * LOGO_AMPLITUDE);
 
-        draw__BITMAP_region(bmpLogo, i*w,0,w,bmpLogo->height, dx + w*i, y, 0);
+        draw_bitmap_region(bmpLogo, i*w,0,w,bmpLogo->height, dx + w*i, y, 0);
     }
 
 }
@@ -301,7 +301,7 @@ static void ts_draw() {
 
         // Draw controls
         int x = -72 + (int)floorf(goAway/GO_AWAY_MAX * 72.0f);
-        draw__BITMAP(bmpControls, x, 0, 0);
+        draw_bitmap(bmpControls, x, 0, 0);
 
         y = (int)floorf(goAway / GO_AWAY_MAX * 96.0f);
         translate(0, y);

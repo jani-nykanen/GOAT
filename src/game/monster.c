@@ -308,7 +308,7 @@ static void animate_monster(MONSTER* m, float tm) {
 // Draw fading
 static void draw_fading(int sx, int sy, int x, int y, int fade, int flip) {
 
-    draw__BITMAP_region_fading(bmpMonsters,sx,sy,
+    draw_bitmap_region_fading(bmpMonsters,sx,sy,
                 32,32,x,y, flip, fade, get_alpha());
 }
 

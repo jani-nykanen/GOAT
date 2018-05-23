@@ -214,7 +214,7 @@ void pause_draw() {
     const int POS_Y = 96-PAUSE_BOX_H/2 + 8; 
 
     // Draw canvas copy
-    draw__BITMAP_fast((_BITMAP*)canvasCopy,0,0);
+    draw_bitmap_fast((_BITMAP*)canvasCopy,0,0);
 
     // Darken
     darken(darkCount);

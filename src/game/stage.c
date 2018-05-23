@@ -338,7 +338,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 1:
     case 2:
 
-        draw__BITMAP_region(bmpPlatforms,32+id*16,48,16,16,x*16,y-16, flip);
+        draw_bitmap_region(bmpPlatforms,32+id*16,48,16,16,x*16,y-16, flip);
         break;
 
     // Tall
@@ -346,7 +346,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 4:
     case 5:
 
-        draw__BITMAP_region(bmpPlatforms,176 + (id-3)*32,0,32,48,x*16,y-48, flip);
+        draw_bitmap_region(bmpPlatforms,176 + (id-3)*32,0,32,48,x*16,y-48, flip);
         break;
 
     // Big
@@ -354,7 +354,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 7:
     case 8:
 
-        draw__BITMAP_region(bmpPlatforms,32 + (id-6)*48,16,48,32,x*16,y-32, flip);
+        draw_bitmap_region(bmpPlatforms,32 + (id-6)*48,16,48,32,x*16,y-32, flip);
         break;
 
     // Low
@@ -362,7 +362,7 @@ static void draw_decoration(int id, int x, int y, int flip) {
     case 10:
     case 11:
 
-        draw__BITMAP_region(bmpPlatforms,0,16 + (id-9)*16,32,16,x*16,y-16, flip);
+        draw_bitmap_region(bmpPlatforms,0,16 + (id-9)*16,32,16,x*16,y-16, flip);
         break;
 
     default:
@@ -389,15 +389,15 @@ static void draw_platform(PLATFORM* p) {
             right = i < TILE_COUNT-1 && p->tiles[i+1] != 2;
 
             // Draw "stripe"
-            draw__BITMAP_region(bmpPlatforms,8*16,0,16,16, i*16, y-16, 0);
+            draw_bitmap_region(bmpPlatforms,8*16,0,16,16, i*16, y-16, 0);
 
             if(left)
-                draw__BITMAP_region(bmpPlatforms,7*16,0,16,16, i*16 -16, y-16, 0);
+                draw_bitmap_region(bmpPlatforms,7*16,0,16,16, i*16 -16, y-16, 0);
 
             if(right)
-                draw__BITMAP_region(bmpPlatforms,9*16,0,16,16, i*16 +16, y-16, 0); 
+                draw_bitmap_region(bmpPlatforms,9*16,0,16,16, i*16 +16, y-16, 0); 
 
-            draw__BITMAP_region(bmpPlatforms,6*16,0,16,16, i*16, y, 0);
+            draw_bitmap_region(bmpPlatforms,6*16,0,16,16, i*16, y, 0);
         }
     }
 
@@ -429,14 +429,14 @@ static void draw_platform(PLATFORM* p) {
             else if(right)
                 tile = 4;
 
-            draw__BITMAP_region(bmpPlatforms,tile*16,0,16,16, i*16, y, 0);
+            draw_bitmap_region(bmpPlatforms,tile*16,0,16,16, i*16, y, 0);
 
             // Draw grass to left & right
             if(left)
-                draw__BITMAP_region(bmpPlatforms,1*16,0,16,16, (i-1)*16, y, 0);
+                draw_bitmap_region(bmpPlatforms,1*16,0,16,16, (i-1)*16, y, 0);
 
             if(right)
-                draw__BITMAP_region(bmpPlatforms,5*16,0,16,16, (i+1)*16, y, 0);
+                draw_bitmap_region(bmpPlatforms,5*16,0,16,16, (i+1)*16, y, 0);
         }
     }
 }
@@ -565,16 +565,16 @@ void stage_draw() {
     int cpos = (int)round(cloudPos);
 
     // Sky
-    draw__BITMAP_fast(bmpSky, 0, 0);
+    draw_bitmap_fast(bmpSky, 0, 0);
 
     // Clouds
     for(; i < 2; ++ i) {
 
-        draw__BITMAP(bmpClouds,cpos + i*bmpClouds->width, 80, 0);
+        draw_bitmap(bmpClouds,cpos + i*bmpClouds->width, 80, 0);
     }
 
     // Mountains
-    draw__BITMAP(bmpMountains,0,192 -96, 0);
+    draw_bitmap(bmpMountains,0,192 -96, 0);
 
     // Draw platforms
     draw_platforms();

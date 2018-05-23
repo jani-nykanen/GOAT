@@ -82,7 +82,7 @@ static void intro_draw() {
         dvalue = (int)( (timer- (INTRO_TIME_INVERVAL - DMAX) ) /DMAX  * 14.0f);
     }
 
-    draw__BITMAP_region(bmpIntro, 0, sy, 144, 96,
+    draw_bitmap_region(bmpIntro, 0, sy, 144, 96,
         128 - 72, 96-48, 0);
 
     if(dvalue > 0)

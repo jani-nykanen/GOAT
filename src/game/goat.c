@@ -250,7 +250,7 @@ static void draw_cloud_sprite(CLOUD* c, int x, int y) {
 
     int fade = 13- (int)floor(c->timer / CLOUD_LIMIT * 12);
 
-    draw__BITMAP_region_fading(bmpGoat,
+    draw_bitmap_region_fading(bmpGoat,
         c->frame*32,c->row*32, 32,32, x,y,c->flip,fade, 255);
 }
 
@@ -293,7 +293,7 @@ static void draw_single_goat(GOAT* g, int x, int y) {
         if(!g->dead) {
 
             int fade = 1 + (int)floor(g->deathTimer / DEATH_TIMER_MAX * 10.0f);
-            draw__BITMAP_region_fading(
+            draw_bitmap_region_fading(
                 bmpGoat,
                 g->spr.frame * g->spr.w,
                 g->spr.row * g->spr.h,
@@ -318,7 +318,7 @@ static void draw_single_goat(GOAT* g, int x, int y) {
         int sw = g->spr.w;
         int sh = g->spr.h;
 
-        draw__BITMAP_region_fading(bmpGoat,sx,sy,sw,sh,x,y, g->flip,2,get_alpha());
+        draw_bitmap_region_fading(bmpGoat,sx,sy,sw,sh,x,y, g->flip,2,get_alpha());
     }
 }
 

@@ -188,7 +188,7 @@ void gem_draw(GEM* gem) {
         if(gem->deathTimer > 0.0f) {
 
             int fade = 1+ (int)round(gem->deathTimer / DEATH_MAX * 8.0f);
-            draw__BITMAP_region_fading(bmpGem,0,gem->isHeart ? 24 : 0,24,24,x,y, FLIP_NONE, fade, get_alpha());
+            draw_bitmap_region_fading(bmpGem,0,gem->isHeart ? 24 : 0,24,24,x,y, FLIP_NONE, fade, get_alpha());
         }   
         return;
     }

@@ -91,11 +91,11 @@ static void draw_game_over_text(int dx, int dy) {
         if(goverTimer < GOVER_MAX) {
 
             int fade = 1 + (int)floorf( goverTimer / GOVER_MAX * 16.0f );
-            draw__BITMAP_region_fading(bmpGameover, c*29, 0,29,64, x, y, 0, fade, get_alpha());
+            draw_bitmap_region_fading(bmpGameover, c*29, 0,29,64, x, y, 0, fade, get_alpha());
 
         }
         else
-            draw__BITMAP_region(bmpGameover, c*29, 0,29,64, x, y, 0);
+            draw_bitmap_region(bmpGameover, c*29, 0,29,64, x, y, 0);
 
         x += XOFF;
         ++ c;

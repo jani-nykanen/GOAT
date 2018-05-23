@@ -51,19 +51,19 @@ void draw_canvas_texture(_POINT pos, _POINT size);
 void fill_rect(int x, int y, int w, int h, Uint8 color);
 
 // Draw a _BITMAP
-void draw__BITMAP(_BITMAP* bmp, int x, int y, int flip);
+void draw_bitmap(_BITMAP* bmp, int x, int y, int flip);
 
 // Draw a _BITMAP region
-void draw__BITMAP_region(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip);
+void draw_bitmap_region(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip);
 
 // Draw a "fading" _BITMAP
-void draw__BITMAP_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip, int fade, Uint8 color);
+void draw_bitmap_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy, int flip, int fade, Uint8 color);
 
 // Faster routine for drawing a _BITMAP (no alpha or flipping)
-void draw__BITMAP_fast(_BITMAP* bmp, int x, int y);
+void draw_bitmap_fast(_BITMAP* bmp, int x, int y);
 
 // Faster routine for drawing a _BITMAP region (no alpha or flipping)
-void draw__BITMAP_region_fast(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy);
+void draw_bitmap_region_fast(_BITMAP* bmp, int sx, int sy, int sw, int sh, int dx, int dy);
 
 // Draw text with a _BITMAP font
 void draw_text(_BITMAP* font, const char* text, int x, int y, int xoff, int yoff, bool center);

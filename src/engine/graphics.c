@@ -334,14 +334,14 @@ void fill_rect(int x, int y, int w, int h, Uint8 color) {
 
 
 // Draw a _BITMAP
-void draw__BITMAP(_BITMAP* bmp, int dx, int dy, int flip) {
+void draw_bitmap(_BITMAP* bmp, int dx, int dy, int flip) {
 
-    draw__BITMAP_region(bmp,0,0,bmp->width,bmp->height,dx,dy,flip);
+    draw_bitmap_region(bmp,0,0,bmp->width,bmp->height,dx,dy,flip);
 }
 
 
 // Draw a _BITMAP region
-void draw__BITMAP_region(_BITMAP* bmp, int sx, int sy, int sw, int sh, 
+void draw_bitmap_region(_BITMAP* bmp, int sx, int sy, int sw, int sh, 
     int dx, int dy, int flip) {
 
     if(bmp == NULL) return;
@@ -415,7 +415,7 @@ void draw__BITMAP_region(_BITMAP* bmp, int sx, int sy, int sw, int sh,
 // Draw a "fading" _BITMAP
 // (For performance reasons I don't add one "super method" for
 //  both this and normal region drawing)
-void draw__BITMAP_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh, 
+void draw_bitmap_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh, 
         int dx, int dy, int flip, 
         int fade, Uint8 color) {
 
@@ -494,14 +494,14 @@ void draw__BITMAP_region_fading(_BITMAP* bmp, int sx, int sy, int sw, int sh,
 
 
 // Faster rendering routine (no alpha or flipping)
-void draw__BITMAP_fast(_BITMAP* bmp, int dx, int dy) {
+void draw_bitmap_fast(_BITMAP* bmp, int dx, int dy) {
 
-    draw__BITMAP_region_fast(bmp,0,0,bmp->width, bmp->height, dx, dy);
+    draw_bitmap_region_fast(bmp,0,0,bmp->width, bmp->height, dx, dy);
 }
 
 
 // Faster routine for drawing a _BITMAP region (no alpha or flipping)
-void draw__BITMAP_region_fast(_BITMAP* bmp, 
+void draw_bitmap_region_fast(_BITMAP* bmp, 
     int sx, int sy, int sw, int sh, int dx, int dy) {
 
     if(bmp == NULL) return;
@@ -561,7 +561,7 @@ void draw_text(_BITMAP* font, const char* text,
         sx = c % 16;
         sy = c / 16;
 
-        draw__BITMAP_region(font,sx*cw,sy*ch,cw,ch,x,y, FLIP_NONE);
+        draw_bitmap_region(font,sx*cw,sy*ch,cw,ch,x,y, FLIP_NONE);
 
         x += cw + xoff;
     }

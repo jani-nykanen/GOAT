@@ -67,7 +67,7 @@ void spr_animate(SPRITE*s, int row, int start, int end, float speed, float tm) {
 // Draw a sprite frame
 void spr_draw_frame(SPRITE*s, _BITMAP* bmp, int frame, int row, int x, int y, int flip) {
 
-    draw__BITMAP_region(bmp,s->w*frame,s->h*row,s->w,s->h,x,y,flip);
+    draw_bitmap_region(bmp,s->w*frame,s->h*row,s->w,s->h,x,y,flip);
 }
 
 
