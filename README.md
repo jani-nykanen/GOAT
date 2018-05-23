@@ -4,7 +4,7 @@
 
 -----------
 
-**Building:
+**Building**:
 
 Don't. Or if you do, run `make` on root. May or may not work.
 
